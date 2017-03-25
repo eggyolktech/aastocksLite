@@ -6,9 +6,6 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by Hin on 3/25/2017.
- */
 public class AastocksGetIndexList {
 
     private static ArrayList<String> codeList;
