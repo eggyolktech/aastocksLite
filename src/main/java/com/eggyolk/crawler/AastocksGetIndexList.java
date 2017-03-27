@@ -94,8 +94,7 @@ public class AastocksGetIndexList {
                 if(currentPos >= links.size())
                     break;
             }
-
-
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
