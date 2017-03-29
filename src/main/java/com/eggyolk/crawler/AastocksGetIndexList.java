@@ -118,15 +118,8 @@ public class AastocksGetIndexList {
     }
 
     public static void main(String[] args) throws Exception {
-
-        AastocksGetIndexList al = new AastocksGetIndexList();
-        ArrayList<AastocksLabel> indexList = al.getAastocksIndexList();
-
-        for (int i=0; i< indexList.size(); i++) {
-            AastocksLabel lbl = indexList.get(i);
-            System.out.println("Code: " + lbl.code + ", Desc: " + lbl.descZh);
-        }
-
-
+        (new AastocksGetIndexList()).getAastocksIndexList().stream().forEach((label) -> {
+            System.out.println(label);
+        });
     }
 }
