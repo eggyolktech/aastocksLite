@@ -17,14 +17,16 @@ public class AastocksJsonWrite {
         (new AastocksGetIndexList()).getAastocksIndexList().stream().forEach((label) -> {
             System.out.println(label);
             JSONObject cobj = new JSONObject();
-            cobj.put(label.descZh, label.code);
+            cobj.put("label", label.descZh);
+            cobj.put("code", label.code);
             list.add(cobj);
+
         });
 
-        obj.put("主要指數", list);
+        obj.put("MajorIdx", list);
 
         try (FileWriter file = new FileWriter("c:\\Test\\test.json")) {
-            file.write(obj.toJSONString());
+            file.write(list.toJSONString());
             file.flush();
 
         } catch (IOException e) {
