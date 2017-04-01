@@ -85,7 +85,8 @@ $(window).load(function(){
     $("#inputCode").focus();
     
     $(document).keypress(function(e) {
-        if(e.which == 13) {
+        // Enter Key
+        if (e.which == 13) {
             if ($("#inputCode").val() == "") {
                 $("#inputCode").val(DEFAULT_CODE);
             } 
@@ -94,8 +95,8 @@ $(window).load(function(){
            
             // List Individual cases
             displaySingleChart($("#inputCode").val());
-            $("#inputCode").select()
-        }
+            $("#inputCode").select();
+        } 
     });
 
     var options = $.map(idxData.list, function ( item, i) {
