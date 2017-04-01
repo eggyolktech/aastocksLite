@@ -33,6 +33,6 @@ public class AastocksJsonWrite {
             e.printStackTrace();
         }
 
-        System.out.print(obj);
+        System.out.print(list);
     }
 }

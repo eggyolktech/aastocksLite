@@ -10,6 +10,35 @@
   <script src="data.js"></script>
 
   <style type="text/css">
+  
+    body {  
+        font-family: Arial;
+        font-size: 13px;
+    }
+
+    a {
+        margin-left: 7px;
+    }
+
+    /* unvisited link */
+    a:link {
+        color: green;
+    }
+
+    /* visited link */
+    a:visited {
+        color: green;
+    }
+
+    /* mouse over link */
+    a:hover {
+        color: red;
+    }
+
+    /* selected link */
+    a:active {
+        color: yellow;
+    }
     
   </style>
 
@@ -18,46 +47,102 @@
 
 <script type='text/javascript'>//<![CDATA[
 
-    var main = "http://charts.aastocks.com/servlet/Charts?fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1&chart=left&type=1";
-    
-    var indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
-    var subchart = "&subChart1=3&ref1para1=12&ref1para2=26&ref1para3=9" 
-                + "&subChart2=7&ref2para1=16&ref2para2=8&ref2para3=8" 
-                + "&subChart3=2&ref3para1=16&ref3para2=0&ref3para3=0"; 
-                //+ "&subChart4=2&ref4para1=3&ref4para2=0&ref4para3=0";
-    var scheme = "&scheme=1&com=100&chartwidth=1073&chartheight=750";
-    var period = "&period=" + 6;
-    var id = "&stockid=";
-    
-    url = main + indicator + subchart + scheme + period + id
+var main = "http://charts.aastocks.com/servlet/Charts?fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1&chart=left&type=1";
+
+var indicator = "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=40&indpara6=52"
+var subchart = "&subChart1=3&ref1para1=12&ref1para2=26&ref1para3=9" 
+            + "&subChart2=7&ref2para1=16&ref2para2=8&ref2para3=8" 
+            + "&subChart3=2&ref3para1=16&ref3para2=0&ref3para3=0"; 
+var subchart_coldfeet = "&subChart4=2&ref4para1=3&ref4para2=0&ref4para3=0";
+var scheme = "&scheme=1&com=100&chartwidth=1073&chartheight=750";
+var scheme_single = "&scheme=1&com=100&chartwidth=1073&chartheight=950";
+var period = "&period=" + 6;
+var id = "&stockid=";
+var DEFAULT_CODE = "110000";
+
+var url = main + indicator + subchart + scheme + period + id
+var url_ind = main + indicator + subchart + subchart_coldfeet + scheme_single + period + id
+
+function displaySingleChart(code){
+
+    if (code) {
+        
+        $("#tfBar").hide();
+        $("#inputCode").val(code);
+        
+        var images = $.map(tfPeriod.list, function ( item, i) {        
+            var regex = /(period=)\d+/;
+            return $('<img>', { id: 'theImg' + code, src: url_ind.replace(regex,"period=" + item.period) + code });
+        }); 
+
+        $("#chartDiv").empty().append(images);
+    }
+}
 
 $(window).load(function(){
+
+    //////// Input Code Box
+    $("#inputCode").focus();
+    
+    $(document).keypress(function(e) {
+        if(e.which == 13) {
+            if ($("#inputCode").val() == "") {
+                $("#inputCode").val(DEFAULT_CODE);
+            } 
+            
+            $('#drp').prop('selectedIndex',0);
+           
+            // List Individual cases
+            displaySingleChart($("#inputCode").val());
+            $("#inputCode").select()
+        }
+    });
 
     var options = $.map(idxData.list, function ( item, i) {
         return $('<option>', { text: item.label, value: item.code });
     });
-
-    var images = $.map(idxData.list, function ( item, i) {
-        return $('<img>', { id: 'theImg' + i, src: url + item.code });
-    });
     
-    $("#drp").empty().append(options);
-    
-    $("#theDiv").empty().append(images);
+    $("#drp").empty().append($('<option>', { text: "指數", value: "" })).append($('<option>', { text: "ALL", value: "ALL" })).append(options);  
 
     $(document).on('change','#drp',function(){
-        $("#answer").text(this.value)
+        
+        var code = this.value;
+        
+        if (code == "") {
+            // Nill case
+        } else if (code == "ALL") {
+            // List all cases
+            $("#tfBar").show();
+            $("#inputCode").val("");
+            
+            var images = $.map(idxData.list, function ( item, i) {
+                return $('<img>', { id: 'theImg' + item.code, src: url + item.code });
+            });             
+            $("#chartDiv").empty().append(images);
+ 
+        } else {
+            // List Individual cases
+            displaySingleChart(code);   
+        }
+        
+        //alert(this.value);
     });
     
-    $(document).on('click','#M',function(){
-        alert("Hello World");
+    //////// Time Frame Toggle (for ALL Case)
+    var links = $.map(tfPeriod.list, function ( item, i)  {        
+        return $('<a>', { id: 'tf_' + item.period, href: "#", text: item.timeframe });
+    }); 
+    $("#tfBar").empty().append(links);
+ 
+    $(document).on('click', 'a[id^="tf"]', function(){        
+        var new_period = this.id.replace("tf_","");
         $('img[id^="theImg"]').filter(
             function(){
                 var regex = /(period=)\d+/;
-                var src = $(this).attr("src").replace(regex,"period=11");
+                var src = $(this).attr("src").replace(regex,"period=" + new_period);
                 $(this).attr("src", src);
         });
-    });
+    }); 
 
 }); //]]> 
 
@@ -67,12 +152,29 @@ $(window).load(function(){
 </head>
 
 <body>
-  <select id="drp"></select>
-  <a id="M" href="#">M</a>&nbsp;<a id="W" href="#">W</a>&nbsp;<a id="D" href="#">D</a>&nbsp;<a id="H" href="#">H</a>&nbsp;<a id="m" href="#">m</a>
+    <table>
+        <tr>
+            <td>
+                <input type="text" id="inputCode" size="10" style="font-size: 12px;">
+            </td>            
+            <td><select id="drp"></select></td>
+            <td>
+                <div id="tfBar">
+                    <!--a id="tfM" href="#">M</a>
+                    <a id="tfW" href="#">W</a>
+                    <a id="tfD" href="#">D</a>
+                    <a id="tfh" href="#">h</a>
+                    <a id="tfm" href="#">m</-->
+                </div>
+            </td>
+        </tr>
+    </table>
+    
+    
+    <p id="spacer"/>
+    <!--h1 id="answer"></h1-->
 
-<h1 id="answer"></h1>
-
-<div id="theDiv">Where is the image?</div>
+    <div id="chartDiv"><img src="./images/enter.png" width="21"/></div>
 
 </body>
 
