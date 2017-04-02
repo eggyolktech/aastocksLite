@@ -10,10 +10,12 @@ public class AastocksLabel {
                 "code='" + code + '\'' +
                 ", descEn='" + descEn + '\'' +
                 ", descZh='" + descZh + '\'' +
+                ", addInfo='" + addInfo + '\'' +
                 '}';
     }
 
     public String code;
     public String descEn;
     public String descZh;
+    public String addInfo;
 }

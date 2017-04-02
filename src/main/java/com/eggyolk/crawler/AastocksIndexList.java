@@ -1,6 +1,8 @@
 package com.eggyolk.crawler;
 
 import com.eggyolk.vo.AastocksLabel;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,9 +11,24 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AastocksGetIndexList {
+public class AastocksIndexList implements AastocksList {
 
-    public ArrayList<AastocksLabel> getAastocksIndexList() throws IOException {
+    public String getJson() throws Exception {
+
+        JSONArray list = new JSONArray();
+
+        (new AastocksIndexList()).getList().stream().forEach((label) -> {
+            System.out.println(label);
+            JSONObject cobj = new JSONObject();
+            cobj.put("label", label.descZh);
+            cobj.put("code", label.code);
+            list.add(cobj);
+        });
+
+        return list.toJSONString();
+    }
+
+    public ArrayList<AastocksLabel> getList() throws Exception {
 
         Document doc;
         ArrayList<String> codeList = new ArrayList();
@@ -47,7 +64,7 @@ public class AastocksGetIndexList {
 
             // get page title
             title = doc.title();
-            System.out.println("\ntitle : " + title);
+            //System.out.println("\ntitle : " + title);
 
             //<a href="http://www.aastocks.com/tc/stock/DetailChart.aspx?symbol=111000"><div class="float_l icon-box icon-chart"></div></a>
             links = doc.select("a[href*=DetailChart.aspx?symbol]");
@@ -76,7 +93,7 @@ public class AastocksGetIndexList {
 
             // get page title
             title = doc.title();
-            System.out.println("\ntitle : " + title);
+            //System.out.println("\ntitle : " + title);
 
             //<a href="http://www.aastocks.com/tc/stock/DetailChart.aspx?symbol=111000"><div class="float_l icon-box icon-chart"></div></a>
             links = doc.select("a[href*=DetailChart.aspx?symbol]");
@@ -118,7 +135,9 @@ public class AastocksGetIndexList {
     }
 
     public static void main(String[] args) throws Exception {
-        (new AastocksGetIndexList()).getAastocksIndexList().stream().forEach((label) -> {
+
+        AastocksList list = new AastocksIndexList();
+        list.getList().stream().forEach((label) -> {
             System.out.println(label);
         });
     }

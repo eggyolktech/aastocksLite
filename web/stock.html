@@ -7,7 +7,8 @@
   <meta name="googlebot" content="noindex, nofollow">
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
   
-  <script src="data.js"></script>
+  <script src="./js/common.js"></script>
+  <script src="./js/data.js"></script>
 
   <style type="text/css">
   
@@ -99,7 +100,7 @@ $(window).load(function(){
         } 
     });
 
-    var options = $.map(idxData.list, function ( item, i) {
+    var options = $.map(indexData.list, function ( item, i) {
         return $('<option>', { text: item.label, value: item.code });
     });
     
@@ -116,7 +117,7 @@ $(window).load(function(){
             $("#tfBar").show();
             $("#inputCode").val("");
             
-            var images = $.map(idxData.list, function ( item, i) {
+            var images = $.map(indexData.list, function ( item, i) {
                 return $('<img>', { id: 'theImg' + item.code, src: url + item.code });
             });             
             $("#chartDiv").empty().append(images);
