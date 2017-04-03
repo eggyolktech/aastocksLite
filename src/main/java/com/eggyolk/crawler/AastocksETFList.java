@@ -35,8 +35,6 @@ public class AastocksETFList implements AastocksList {
 
         try {
 
-
-
             // need http protocol
             doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/etf/default.aspx").get();
 
@@ -53,14 +51,14 @@ public class AastocksETFList implements AastocksList {
 
                 // Check only if have Turnover
                 if (!cols.get(6).text().equals("0.00") && !cols.get(6).text().equals("")) {
-                    //System.out.println("Name: " + cols.get(0).text().split(" ")[0]);
+                    //System.out.println("Name: " + cols.get(0).text().split(" ")[0].replace(" ", ""));
                     //System.out.println("Code: " + cols.get(0).text().split(" ")[1].replace(".HK", ""));
                     //System.out.println("Ref Entity: " + cols.get(1).text());
                     //System.out.println("Turnover [" + cols.get(6).text() + "]\n");
 
                     AastocksLabel lbl = new AastocksLabel();
                     lbl.code = cols.get(0).text().split(" ")[1].replace(".HK", "");
-                    lbl.descZh = cols.get(0).text().split(" ")[0];
+                    lbl.descZh = cols.get(0).text().split(" ")[0].replace(" ", "");
                     lbl.addInfo = cols.get(1).text();
                     list.add(lbl);
                 }
@@ -80,5 +78,7 @@ public class AastocksETFList implements AastocksList {
         list.getList().stream().forEach((label) -> {
             System.out.println(label);
         });
+
+        System.out.println(list.getJson());
     }
 }
