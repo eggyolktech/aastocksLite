@@ -1,3 +1,5 @@
+import com.eggyolk.crawler.AastocksBlueChipList;
+import com.eggyolk.crawler.AastocksETFList;
 import com.eggyolk.crawler.AastocksIndexList;
 
 import java.io.FileWriter;
@@ -26,7 +28,10 @@ public class AastocksWriteToJS {
         prop.load(input);
         String jsFilePath = prop.getProperty("jspath") + prop.getProperty("jsfile");
         try (FileWriter file = new FileWriter(jsFilePath)) {
+
             file.write(getJsListContent("indexData", new AastocksIndexList().getJson()));
+            file.write(getJsListContent("etfData", new AastocksETFList().getJson()));
+            file.write(getJsListContent("blueChipData", new AastocksBlueChipList().getJson()));
             file.flush();
 
             System.out.println("JS File written to " + jsFilePath);
@@ -39,7 +44,7 @@ public class AastocksWriteToJS {
     }
 
     public String getJsListContent(String listName, String json) {
-        String v = "var " + listName + " ={\n\tlist:" + json + "\n};";
+        String v = "var " + listName + " ={\n\tlist:" + json + "\n};\n\n";
         return v;
     }
 }

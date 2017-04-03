@@ -11,13 +11,13 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AastocksETFList implements AastocksList {
+public class AastocksBlueChipList implements AastocksList {
 
     public String getJson() throws Exception {
 
         JSONArray list = new JSONArray();
 
-        (new AastocksETFList()).getList().stream().forEach((label) -> {
+        (new AastocksBlueChipList()).getList().stream().forEach((label) -> {
             System.out.println(label);
             JSONObject cobj = new JSONObject();
             cobj.put("label", label.descZh);
@@ -36,32 +36,23 @@ public class AastocksETFList implements AastocksList {
         try {
 
             // need http protocol
-            doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/etf/default.aspx").get();
+            doc = Jsoup.connect("http://www.etnet.com.hk/www/tc/stocks/indexes_detail.php?subtype=HSI").get();
 
             // get page title
             String title = doc.title();
             System.out.println("title : " + title);
 
-            Element table = doc.select("table#tabETF1").get(0);
+            Element table = doc.select("table[class=figureTable]").get(0);
             Elements rows = table.select("tr");
 
             for (int i = 1; i < rows.size(); i++) { // first row is the col names so skip it.
                 Element row = rows.get(i);
                 Elements cols = row.select("td");
 
-                // Check only if have Turnover
-                if (!cols.get(6).text().equals("0.00") && !cols.get(6).text().equals("")) {
-                    //System.out.println("Name: " + cols.get(0).text().split(" ")[0].replace(" ", ""));
-                    //System.out.println("Code: " + cols.get(0).text().split(" ")[1].replace(".HK", ""));
-                    //System.out.println("Ref Entity: " + cols.get(1).text());
-                    //System.out.println("Turnover [" + cols.get(6).text() + "]\n");
-
-                    AastocksLabel lbl = new AastocksLabel();
-                    lbl.code = cols.get(0).text().split(" ")[1].replace(".HK", "");
-                    lbl.descZh = cols.get(0).text().split(" ")[0].replace(" ", "");
-                    lbl.addInfo = cols.get(1).text();
-                    list.add(lbl);
-                }
+                AastocksLabel lbl = new AastocksLabel();
+                lbl.code = cols.get(0).text();
+                lbl.descZh = cols.get(1).text();
+                list.add(lbl);
             }
 
         } catch (IOException e) {
@@ -74,7 +65,7 @@ public class AastocksETFList implements AastocksList {
 
     public static void main(String[] args) throws Exception {
 
-        AastocksList list = new AastocksETFList();
+        AastocksList list = new AastocksBlueChipList();
         System.out.println(list.getJson());
     }
 }
