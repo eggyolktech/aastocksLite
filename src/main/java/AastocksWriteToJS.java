@@ -1,6 +1,7 @@
 import com.eggyolk.crawler.AastocksBlueChipList;
 import com.eggyolk.crawler.AastocksETFList;
 import com.eggyolk.crawler.AastocksIndexList;
+import com.eggyolk.crawler.AastocksIndustryList;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class AastocksWriteToJS {
             file.write(getJsListContent("indexData", new AastocksIndexList().getJson()));
             file.write(getJsListContent("etfData", new AastocksETFList().getJson()));
             file.write(getJsListContent("blueChipData", new AastocksBlueChipList().getJson()));
+            file.write(getJsListContent("industryData", new AastocksIndustryList().getJson()));
             file.flush();
 
             System.out.println("JS File written to " + jsFilePath);

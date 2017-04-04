@@ -9,32 +9,56 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class AastocksIndustryList implements AastocksList {
 
     public String getJson() throws Exception {
 
         JSONArray list = new JSONArray();
+        LinkedHashMap map = this.getIndustryMap();
 
-        (new AastocksIndustryList()).getList().stream().forEach((label) -> {
-            System.out.println(label);
+        // Get a set of the entries
+        Set set = map.entrySet();
+
+        // Get an iterator
+        Iterator i = set.iterator();
+
+        // Display elements
+        while(i.hasNext()) {
+            Map.Entry me = (Map.Entry)i.next();
+            AastocksLabel lbl = (AastocksLabel) me.getKey();
+            ArrayList<AastocksLabel> indlist = (ArrayList<AastocksLabel>) me.getValue();
+
             JSONObject cobj = new JSONObject();
-            cobj.put("label", label.descZh);
-            cobj.put("code", label.code);
+            cobj.put("label", lbl.descZh);
+            cobj.put("code", lbl.code);
+
+            JSONArray jsonList = new JSONArray();
+
+            indlist.stream().forEach((label) -> {
+
+                JSONObject iobj = new JSONObject();
+                iobj.put("label", label.descZh);
+                iobj.put("code", label.code);
+                jsonList.add(iobj);
+            });
+
+            cobj.put("list", jsonList);
             list.add(cobj);
-        });
+
+
+            //System.out.print(me.getKey() + ": ");
+            //System.out.println(me.getValue());
+        }
 
         return list.toJSONString();
     }
 
     public ArrayList<AastocksLabel> getList() throws Exception {
 
-        Document doc, docdtl;
-
-        // Create a hash map
-        LinkedHashMap lhm = new LinkedHashMap();
+        Document doc;
+        ArrayList<AastocksLabel> list  = new ArrayList();
 
         try {
 
@@ -43,7 +67,7 @@ public class AastocksIndustryList implements AastocksList {
 
             // get page title
             String title = doc.title();
-            System.out.println("title : " + title);
+            //System.out.println("title : " + title);
 
             Element select = doc.select("select[class=DefaultAAIndustryConstituentDdl]").get(0);
             Elements options = select.select("option");
@@ -51,12 +75,36 @@ public class AastocksIndustryList implements AastocksList {
             for (int i = 1; i < options.size(); i++) { // first row is the col names so skip it.
                 Element option = options.get(i);
 
-                System.out.println(option.text() + "[" + option.attr("value") + "]");
-                docdtl = Jsoup.connect("http://services1.aastocks.com/web/cjsh/IndustrySection.aspx?CJSHLanguage=Chi&symbol=&industry=" +  option.attr("value")).get();
+                //System.out.println(option.text() + "[" + option.attr("value") + "]");
+                AastocksLabel lbl = new AastocksLabel();
+                lbl.code = option.attr("value");
+                lbl.descZh = option.text();
+                lbl.addInfo ="";
+                list.add(lbl);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        }
 
-                Element table = docdtl.select("table[class=DefaultAAIndustryConstituentDataTable]").get(0);
+        return list;
+    }
+
+    public LinkedHashMap getIndustryMap() throws Exception {
+
+        // Create a hash map
+        LinkedHashMap lhm = new LinkedHashMap();
+        ArrayList<AastocksLabel> list = this.getList();
+
+        this.getList().stream().forEach((label) -> {
+            //System.out.println(label);
+
+            try {
+
+                Document doc = Jsoup.connect("http://services1.aastocks.com/web/cjsh/IndustrySection.aspx?CJSHLanguage=Chi&symbol=&industry=" + label.code).get();
+                ArrayList<AastocksLabel> sublist = new ArrayList();
+                Element table = doc.select("table[class=DefaultAAIndustryConstituentDataTable]").get(0);
                 Elements rows = table.select("tr");
-                ArrayList<AastocksLabel> list  = new ArrayList();
 
                 for (int j = 2; j < rows.size(); j++) { // first row is the col names so skip it.
                     Element row = rows.get(j);
@@ -66,19 +114,20 @@ public class AastocksIndustryList implements AastocksList {
                     lbl.code = cols.get(0).text();
                     lbl.descZh = cols.get(1).text();
                     lbl.addInfo = cols.get(6).text();
-                    list.add(lbl);
-                    System.out.println(lbl);
+                    sublist.add(lbl);
+                    //System.out.println(lbl);
                 }
 
-                lhm.put(option.text(), list);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
-        }
+                System.out.println(label.descZh + "/" + label.code + ": [" + sublist.size() + " record(s)]");
 
-        ArrayList<AastocksLabel> list  = new ArrayList();
-        return list;
+                lhm.put(label, sublist);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return lhm;
     }
 
     public static void main(String[] args) throws Exception {

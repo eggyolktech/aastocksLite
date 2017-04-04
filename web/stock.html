@@ -80,19 +80,62 @@ function displaySingleChart(code){
     }
 }
 
+function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset ) {
+
+    var options = $.map(drpData.list, function ( item, i) {
+        return $('<option>', { text: item.label, value: item.code });
+    });
+    
+    $("#" + drpId).empty()
+        .append($('<option>', { text: drpDesc, value: "" }))
+        .append($('<option>', { text: "ALL", value: "ALL" }))
+        .append(options);  
+
+    $(document).on('change','#' + drpId ,function(){
+        
+        var code = this.value;
+        
+        if (code == "") {
+            // Nill case
+            return;
+        } else if (code == "ALL") {
+            // List all cases
+            $("#tfBar").show();
+            $("#inputCode").val("");
+            
+            var images = $.map(drpData.list, function ( item, i) {
+                return $('<img>', { id: 'theImg' + item.code, src: url + item.code });
+            });
+            
+            $("#chartDiv").empty().append(images);    
+  
+        } else {
+            // List Individual cases
+            displaySingleChart(code);
+        }
+        
+        if (!drpToSkipReset) {
+            $('select[id^="drp"]' + ':not(#' + drpId + ')').prop('selectedIndex',0);
+        } else {
+            $('select[id^="drp"]' + ':not(#' + drpId + ',#' + drpToSkipReset + ')').prop('selectedIndex',0);
+        }  
+    });
+}
+
 $(window).load(function(){
 
     //////// Input Code Box
     $("#inputCode").focus();
     
     $(document).keypress(function(e) {
+        
         // Enter Key
         if (e.which == 13) {
             if ($("#inputCode").val() == "") {
                 $("#inputCode").val(DEFAULT_CODE);
             } 
             
-            $('#drp').prop('selectedIndex',0);
+            $('select[id^="drp"]').prop('selectedIndex',0);
            
             // List Individual cases
             displaySingleChart($("#inputCode").val());
@@ -100,34 +143,39 @@ $(window).load(function(){
         } 
     });
 
-    var options = $.map(indexData.list, function ( item, i) {
-        return $('<option>', { text: item.label, value: item.code });
-    });
+    //////// Index Dropdown List
+    createDropdownMenu("drpIndex", indexData, "指數");
+        
+    //////// ETF Dropdown List
+    createDropdownMenu("drpETF", etfData, "ETF");
+ 
+    //////// Bluechip Dropdown List
+    createDropdownMenu("drpBluechip", blueChipData, "指數成分股");
     
-    $("#drp").empty().append($('<option>', { text: "指數", value: "" })).append($('<option>', { text: "ALL", value: "ALL" })).append(options);  
+    //////// Industry Dropdown List
+    options = $.map(industryData.list, function (item, i) {
+        return $('<option>', { text: item.label, value: item.code });
+    }); 
 
-    $(document).on('change','#drp',function(){
+    $("#drpIndustry").empty()
+        .append($('<option>', { text: "行業分類", value: "" }))
+        .append(options);      
+        
+    $(document).on('change','#drpIndustry' ,function(){
         
         var code = this.value;
         
         if (code == "") {
             // Nill case
-        } else if (code == "ALL") {
-            // List all cases
-            $("#tfBar").show();
-            $("#inputCode").val("");
-            
-            var images = $.map(indexData.list, function ( item, i) {
-                return $('<img>', { id: 'theImg' + item.code, src: url + item.code });
-            });             
-            $("#chartDiv").empty().append(images);
- 
         } else {
-            // List Individual cases
-            displaySingleChart(code);   
+            // Generate Sub Industry List  
+            var filteredIndustry = $(industryData.list).filter(function( idx ) {
+                return industryData.list[idx].code == code;
+            }); 
+            
+            //////// Create Industry Sub Dropdown List
+            createDropdownMenu("drpIndustrySub", filteredIndustry[0], "請選擇", "drpIndustry");            
         }
-        
-        //alert(this.value);
     });
     
     //////// Time Frame Toggle (for ALL Case)
@@ -159,7 +207,11 @@ $(window).load(function(){
             <td>
                 <input type="text" id="inputCode" size="10" style="font-size: 12px;">
             </td>            
-            <td><select id="drp"></select></td>
+            <td><select id="drpIndex"></select></td>
+            <td><select id="drpETF"></select></td>
+            <td><select id="drpBluechip"></select></td>
+            <td><select id="drpIndustry"></select></td>
+            <td><select id="drpIndustrySub"></select></td>
             <td>
                 <div id="tfBar">
                     <!--a id="tfM" href="#">M</a>
