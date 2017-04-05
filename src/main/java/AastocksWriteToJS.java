@@ -1,11 +1,9 @@
-import com.eggyolk.crawler.AastocksBlueChipList;
-import com.eggyolk.crawler.AastocksETFList;
-import com.eggyolk.crawler.AastocksIndexList;
-import com.eggyolk.crawler.AastocksIndustryList;
+import com.eggyolk.crawler.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Properties;
 
 public class AastocksWriteToJS {
@@ -16,7 +14,7 @@ public class AastocksWriteToJS {
         (new AastocksWriteToJS()).writeJS();
     }
 
-    public void writeJS() throws IOException {
+    public void writeJS() throws Exception {
 
         final String SEP = "\\";
 
@@ -37,6 +35,35 @@ public class AastocksWriteToJS {
             file.flush();
 
             System.out.println("JS File written to " + jsFilePath);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.writeJsonListFile("ETF", new AastocksETFList());
+        this.writeJsonListFile("BlueChip", new AastocksBlueChipList());
+        this.writeJsonListFile("Industry", new AastocksIndustryList());
+    }
+
+    public void writeJsonListFile(String listName, AastocksList list) throws Exception {
+
+        Properties prop = new Properties();
+        InputStream input;
+        input = this.getClass().getResourceAsStream("main.properties");
+
+        // load a properties file
+        prop.load(input);
+
+        String jsonFilePath = prop.getProperty("jsonpath") + MessageFormat.format((String) prop.get("jsonfile"), listName);
+
+        try (FileWriter file = new FileWriter(jsonFilePath)) {
+
+            file.write(list.getJson());
+            file.flush();
+
+            System.out.println("JSON File written to " + jsonFilePath);
 
         } catch (IOException e) {
             e.printStackTrace();
