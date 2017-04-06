@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.*;
 
-public class AastocksIndustryList implements AastocksList {
+public class AastocksHKIndustryList implements AastocksList {
 
     public String getJson() throws Exception {
 
@@ -132,7 +132,7 @@ public class AastocksIndustryList implements AastocksList {
 
     public static void main(String[] args) throws Exception {
 
-        AastocksList list = new AastocksIndustryList();
+        AastocksList list = new AastocksHKIndustryList();
         System.out.println(list.getJson());
     }
 }

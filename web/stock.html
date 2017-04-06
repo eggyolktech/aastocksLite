@@ -43,7 +43,7 @@
     
   </style>
 
-  <title>Stock Chart Chart</title>
+  <title>Aastocks Lite</title>
 
 
 <script type='text/javascript'>//<![CDATA[
@@ -61,6 +61,8 @@ var period = "&period=" + 6;
 var id = "&stockid=";
 var DEFAULT_CODE = "110000";
 
+http://charts.aastocks.com/servlet/Charts?com=100&logoStyle=1&chartwidth=672&chartheight=689&scheme=1&stockid=SUN.US&period=46&type=1&fontsize=12&Indicator=1&indpara1=10&indpara2=20&indpara3=50&indpara4=100&indpara5=150&subChart1=2&ref1para1=14&ref1para2=&ref1para3=&subChart2=3&ref2para1=12&ref2para2=26&ref2para3=9&subChart3=12&ref3para1=&ref3para2=&ref3para3=&subChart4=0&ref4para1=&ref4para2=&ref4para3=&subChart5=0&ref5para1=&ref5para2=&ref5para3=&chiname=T&titlestyle=1&15MinDelay=T
+
 var url = main + indicator + subchart + scheme + period + id
 var url_ind = main + indicator + subchart + subchart_coldfeet + scheme_single + period + id
 
@@ -73,10 +75,11 @@ function displaySingleChart(code){
         
         var images = $.map(tfPeriod.list, function ( item, i) {        
             var regex = /(period=)\d+/;
-            return $('<img>', { id: 'theImg' + code, src: url_ind.replace(regex,"period=" + item.period) + code });
+            return $('<img>', { id: 'chart' + code, src: url_ind.replace(regex,"period=" + item.period) + code });
         }); 
 
         $("#chartDiv").empty().append(images);
+        $("#anchorDiv").empty()
     }
 }
 
@@ -103,11 +106,16 @@ function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset ) {
             $("#tfBar").show();
             $("#inputCode").val("");
             
-            var images = $.map(drpData.list, function ( item, i) {
-                return $('<img>', { id: 'theImg' + item.code, src: url + item.code });
+            var anchors = $.map(drpData.list, function ( item, i) {
+                return $('<a>', { href: '#chart' + item.code, text: item.label });
             });
             
-            $("#chartDiv").empty().append(images);    
+            var images = $.map(drpData.list, function ( item, i) {
+                return $('<img>', { id: 'chart' + item.code, src: url + item.code });
+            });
+            
+            $("#anchorDiv").empty().append(anchors);            
+            $("#chartDiv").empty().append(images);  
   
         } else {
             // List Individual cases
@@ -186,7 +194,10 @@ $(window).load(function(){
  
     $(document).on('click', 'a[id^="tf"]', function(){        
         var new_period = this.id.replace("tf_","");
-        $('img[id^="theImg"]').filter(
+        var first_chart_code = $('img[id^="chart"]').first().attr("id").replace("chart","");
+        //alert(first_chart_code);
+        
+        $('img[id^="chart"]').filter(
             function(){
                 var regex = /(period=)\d+/;
                 var src = $(this).attr("src").replace(regex,"period=" + new_period);
@@ -224,10 +235,9 @@ $(window).load(function(){
         </tr>
     </table>
     
-    
     <p id="spacer"/>
-    <!--h1 id="answer"></h1-->
-
+    <div id="anchorDiv"></div>
+    <p id="spacer"/>
     <div id="chartDiv"><img src="./images/enter.png" width="21"/></div>
 
 </body>

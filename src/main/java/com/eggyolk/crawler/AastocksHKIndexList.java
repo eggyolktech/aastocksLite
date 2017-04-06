@@ -11,13 +11,13 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AastocksIndexList implements AastocksList {
+public class AastocksHKIndexList implements AastocksList {
 
     public String getJson() throws Exception {
 
         JSONArray list = new JSONArray();
 
-        (new AastocksIndexList()).getList().stream().forEach((label) -> {
+        (new AastocksHKIndexList()).getList().stream().forEach((label) -> {
             System.out.println(label);
             JSONObject cobj = new JSONObject();
             cobj.put("label", label.descZh);
@@ -136,7 +136,7 @@ public class AastocksIndexList implements AastocksList {
 
     public static void main(String[] args) throws Exception {
 
-        AastocksList list = new AastocksIndexList();
+        AastocksList list = new AastocksHKIndexList();
         list.getList().stream().forEach((label) -> {
             System.out.println(label);
         });

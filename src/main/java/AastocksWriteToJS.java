@@ -28,10 +28,10 @@ public class AastocksWriteToJS {
         String jsFilePath = prop.getProperty("jspath") + prop.getProperty("jsfile");
         try (FileWriter file = new FileWriter(jsFilePath)) {
 
-            file.write(getJsListContent("indexData", new AastocksIndexList().getJson()));
-            file.write(getJsListContent("etfData", new AastocksETFList().getJson()));
-            file.write(getJsListContent("blueChipData", new AastocksBlueChipList().getJson()));
-            file.write(getJsListContent("industryData", new AastocksIndustryList().getJson()));
+            file.write(getJsListContent("indexData", new AastocksHKIndexList().getJson()));
+            file.write(getJsListContent("etfData", new AastocksHKETFList().getJson()));
+            file.write(getJsListContent("blueChipData", new AastocksHKBlueChipList().getJson()));
+            file.write(getJsListContent("industryData", new AastocksHKIndustryList().getJson()));
             file.flush();
 
             System.out.println("JS File written to " + jsFilePath);
@@ -42,9 +42,9 @@ public class AastocksWriteToJS {
             e.printStackTrace();
         }
 
-        this.writeJsonListFile("ETF", new AastocksETFList());
-        this.writeJsonListFile("BlueChip", new AastocksBlueChipList());
-        this.writeJsonListFile("Industry", new AastocksIndustryList());
+        this.writeJsonListFile("ETF", new AastocksHKETFList());
+        this.writeJsonListFile("BlueChip", new AastocksHKBlueChipList());
+        this.writeJsonListFile("Industry", new AastocksHKIndustryList());
     }
 
     public void writeJsonListFile(String listName, AastocksList list) throws Exception {
