@@ -23,16 +23,16 @@ public class GetUSSnPIndustryList implements GenericLabelList {
 
         // Get an iterator
         Iterator i = set.iterator();
-
+        int id = 1;
         // Display elements
         while(i.hasNext()) {
-            Map.Entry me = (Map.Entry)i.next();
+            Map.Entry me = (Map.Entry) i.next();
             Label lbl = (Label) me.getKey();
             ArrayList<Label> indlist = (ArrayList<Label>) me.getValue();
 
             JSONObject cobj = new JSONObject();
             cobj.put("label", lbl.descEn);
-            cobj.put("code", lbl.code);
+            cobj.put("code", id);
 
             JSONArray jsonList = new JSONArray();
 
@@ -47,7 +47,7 @@ public class GetUSSnPIndustryList implements GenericLabelList {
             cobj.put("list", jsonList);
             list.add(cobj);
 
-
+            id++;
             //System.out.print(me.getKey() + ": ");
             //System.out.println(me.getValue());
         }
