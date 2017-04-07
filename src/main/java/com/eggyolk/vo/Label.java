@@ -3,10 +3,10 @@ package com.eggyolk.vo;
 /**
  * Created by Hin on 3/26/2017.
  */
-public class AastocksLabel {
+public class Label {
     @Override
     public String toString() {
-        return "AastocksLabel{" +
+        return "Label{" +
                 "code='" + code + '\'' +
                 ", descEn='" + descEn + '\'' +
                 ", descZh='" + descZh + '\'' +

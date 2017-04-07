@@ -1,6 +1,6 @@
 package com.eggyolk.crawler;
 
-import com.eggyolk.vo.AastocksLabel;
+import com.eggyolk.vo.Label;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
@@ -11,13 +11,13 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AastocksHKIndexList implements AastocksList {
+public class GetHKIndexList implements GenericLabelList {
 
     public String getJson() throws Exception {
 
         JSONArray list = new JSONArray();
 
-        (new AastocksHKIndexList()).getList().stream().forEach((label) -> {
+        (new GetHKIndexList()).getList().stream().forEach((label) -> {
             System.out.println(label);
             JSONObject cobj = new JSONObject();
             cobj.put("label", label.descZh);
@@ -28,7 +28,7 @@ public class AastocksHKIndexList implements AastocksList {
         return list.toJSONString();
     }
 
-    public ArrayList<AastocksLabel> getList() throws Exception {
+    public ArrayList<Label> getList() throws Exception {
 
         Document doc;
         ArrayList<String> codeList = new ArrayList();
@@ -122,10 +122,10 @@ public class AastocksHKIndexList implements AastocksList {
             throw e;
         }
 
-        ArrayList<AastocksLabel> indexList  = new ArrayList();
+        ArrayList<Label> indexList  = new ArrayList();
 
         for (int i=0; i< codeList.size(); i++) {
-            AastocksLabel lbl = new AastocksLabel();
+            Label lbl = new Label();
             lbl.code = codeList.get(i);
             lbl.descZh = textList.get(i);
             indexList.add(lbl);
@@ -136,7 +136,7 @@ public class AastocksHKIndexList implements AastocksList {
 
     public static void main(String[] args) throws Exception {
 
-        AastocksList list = new AastocksHKIndexList();
+        GenericLabelList list = new GetHKIndexList();
         list.getList().stream().forEach((label) -> {
             System.out.println(label);
         });

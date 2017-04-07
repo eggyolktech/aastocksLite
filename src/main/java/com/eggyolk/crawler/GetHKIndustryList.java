@@ -1,6 +1,6 @@
 package com.eggyolk.crawler;
 
-import com.eggyolk.vo.AastocksLabel;
+import com.eggyolk.vo.Label;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.*;
 
-public class AastocksHKIndustryList implements AastocksList {
+public class GetHKIndustryList implements GenericLabelList {
 
     public String getJson() throws Exception {
 
@@ -27,8 +27,8 @@ public class AastocksHKIndustryList implements AastocksList {
         // Display elements
         while(i.hasNext()) {
             Map.Entry me = (Map.Entry)i.next();
-            AastocksLabel lbl = (AastocksLabel) me.getKey();
-            ArrayList<AastocksLabel> indlist = (ArrayList<AastocksLabel>) me.getValue();
+            Label lbl = (Label) me.getKey();
+            ArrayList<Label> indlist = (ArrayList<Label>) me.getValue();
 
             JSONObject cobj = new JSONObject();
             cobj.put("label", lbl.descZh);
@@ -55,10 +55,10 @@ public class AastocksHKIndustryList implements AastocksList {
         return list.toJSONString();
     }
 
-    public ArrayList<AastocksLabel> getList() throws Exception {
+    public ArrayList<Label> getList() throws Exception {
 
         Document doc;
-        ArrayList<AastocksLabel> list  = new ArrayList();
+        ArrayList<Label> list  = new ArrayList();
 
         try {
 
@@ -76,7 +76,7 @@ public class AastocksHKIndustryList implements AastocksList {
                 Element option = options.get(i);
 
                 //System.out.println(option.text() + "[" + option.attr("value") + "]");
-                AastocksLabel lbl = new AastocksLabel();
+                Label lbl = new Label();
                 lbl.code = option.attr("value");
                 lbl.descZh = option.text();
                 lbl.addInfo ="";
@@ -94,7 +94,7 @@ public class AastocksHKIndustryList implements AastocksList {
 
         // Create a hash map
         LinkedHashMap lhm = new LinkedHashMap();
-        ArrayList<AastocksLabel> list = this.getList();
+        ArrayList<Label> list = this.getList();
 
         this.getList().stream().forEach((label) -> {
             //System.out.println(label);
@@ -102,7 +102,7 @@ public class AastocksHKIndustryList implements AastocksList {
             try {
 
                 Document doc = Jsoup.connect("http://services1.aastocks.com/web/cjsh/IndustrySection.aspx?CJSHLanguage=Chi&symbol=&industry=" + label.code).get();
-                ArrayList<AastocksLabel> sublist = new ArrayList();
+                ArrayList<Label> sublist = new ArrayList();
                 Element table = doc.select("table[class=DefaultAAIndustryConstituentDataTable]").get(0);
                 Elements rows = table.select("tr");
 
@@ -110,7 +110,7 @@ public class AastocksHKIndustryList implements AastocksList {
                     Element row = rows.get(j);
                     Elements cols = row.select("td");
 
-                    AastocksLabel lbl = new AastocksLabel();
+                    Label lbl = new Label();
                     lbl.code = cols.get(0).text();
                     lbl.descZh = cols.get(1).text();
                     lbl.addInfo = cols.get(6).text();
@@ -132,7 +132,7 @@ public class AastocksHKIndustryList implements AastocksList {
 
     public static void main(String[] args) throws Exception {
 
-        AastocksList list = new AastocksHKIndustryList();
+        GenericLabelList list = new GetHKIndustryList();
         System.out.println(list.getJson());
     }
 }

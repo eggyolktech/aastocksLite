@@ -1,6 +1,6 @@
 package com.eggyolk.crawler;
 
-import com.eggyolk.vo.AastocksLabel;
+import com.eggyolk.vo.Label;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
@@ -11,13 +11,13 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AastocksHKETFList implements AastocksList {
+public class GetHKETFList implements GenericLabelList {
 
     public String getJson() throws Exception {
 
         JSONArray list = new JSONArray();
 
-        (new AastocksHKETFList()).getList().stream().forEach((label) -> {
+        (new GetHKETFList()).getList().stream().forEach((label) -> {
             System.out.println(label);
             JSONObject cobj = new JSONObject();
             cobj.put("label", label.descZh);
@@ -28,10 +28,10 @@ public class AastocksHKETFList implements AastocksList {
         return list.toJSONString();
     }
 
-    public ArrayList<AastocksLabel> getList() throws Exception {
+    public ArrayList<Label> getList() throws Exception {
 
         Document doc;
-        ArrayList<AastocksLabel> list  = new ArrayList();
+        ArrayList<Label> list  = new ArrayList();
 
         try {
 
@@ -56,7 +56,7 @@ public class AastocksHKETFList implements AastocksList {
                     //System.out.println("Ref Entity: " + cols.get(1).text());
                     //System.out.println("Turnover [" + cols.get(6).text() + "]\n");
 
-                    AastocksLabel lbl = new AastocksLabel();
+                    Label lbl = new Label();
                     lbl.code = cols.get(0).text().split(" ")[1].replace(".HK", "");
                     lbl.descZh = cols.get(0).text().split(" ")[0].replace(" ", "");
                     lbl.addInfo = cols.get(1).text();
@@ -74,7 +74,7 @@ public class AastocksHKETFList implements AastocksList {
 
     public static void main(String[] args) throws Exception {
 
-        AastocksList list = new AastocksHKETFList();
+        GenericLabelList list = new GetHKETFList();
         System.out.println(list.getJson());
     }
 }
