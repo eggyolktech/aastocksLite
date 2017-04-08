@@ -69,11 +69,21 @@ var url_ind = main + indicator + subchart + subchart_coldfeet + scheme_single + 
 function displaySingleChart(code){
 
     if (code) {
-        
+    
+        var isUS = false;
+
+        if (!/[^a-zA-Z]/.test(code)) {
+            code = code + ".US";
+            isUS = true;
+        }
+    
         $("#tfBar").hide();
         $("#inputCode").val(code);
         
-        var images = $.map(tfPeriod.list, function ( item, i) {        
+        var list = tfPeriod.list;
+        if (isUS) list = tfUSPeriod.list;
+        
+        var images = $.map(list, function ( item, i) {        
             var regex = /(period=)\d+/;
             return $('<img>', { id: 'chart' + code, src: url_ind.replace(regex,"period=" + item.period) + code });
         }); 
@@ -153,21 +163,21 @@ $(window).load(function(){
 
     //////// Index Dropdown List
     createDropdownMenu("drpIndex", indexData, "指數");
-        
-    //////// ETF Dropdown List
-    createDropdownMenu("drpETF", etfData, "ETF");
  
     //////// Bluechip Dropdown List
     createDropdownMenu("drpBluechip", blueChipData, "指數成分股");
     
     //////// Industry Dropdown List
-    options = $.map(industryData.list, function (item, i) {
+    optionsIndustry = $.map(industryData.list, function (item, i) {
         return $('<option>', { text: item.label, value: item.code });
     }); 
 
+    optionETF = $('<option>', { text: "ETF", value: "ETF" });
+    
     $("#drpIndustry").empty()
-        .append($('<option>', { text: "行業分類", value: "" }))
-        .append(options);      
+        .append($('<option>', { text: "股票分類", value: "" }))
+        .append(optionETF)
+        .append(optionsIndustry);      
         
     $(document).on('change','#drpIndustry' ,function(){
         
@@ -175,7 +185,11 @@ $(window).load(function(){
         
         if (code == "") {
             // Nill case
+        } else if (code == "ETF") {        
+             //////// Create ETF Sub Dropdown List
+            createDropdownMenu("drpIndustrySub", etfData, "請選擇", "drpIndustry");
         } else {
+        
             // Generate Sub Industry List  
             var filteredIndustry = $(industryData.list).filter(function( idx ) {
                 return industryData.list[idx].code == code;
@@ -219,7 +233,6 @@ $(window).load(function(){
                 <input type="text" id="inputCode" size="10" style="font-size: 12px;">
             </td>            
             <td><select id="drpIndex"></select></td>
-            <td><select id="drpETF"></select></td>
             <td><select id="drpBluechip"></select></td>
             <td><select id="drpIndustry"></select></td>
             <td><select id="drpIndustrySub"></select></td>

@@ -28,10 +28,12 @@ public class AastocksWriteToJS {
         String jsFilePath = prop.getProperty("jspath") + prop.getProperty("jsfile");
         try (FileWriter file = new FileWriter(jsFilePath)) {
 
-            file.write(getJsListContent("indexData", new GetHKIndexList().getJson()));
+            file.write(getJsListContent("indexData", new GetHKHSIIndexList().getJson()));
             file.write(getJsListContent("etfData", new GetHKETFList().getJson()));
             file.write(getJsListContent("blueChipData", new GetHKBlueChipList().getJson()));
+            file.write(getJsListContent("indexListData", new GetHKIndexList().getJson()));
             file.write(getJsListContent("industryData", new GetHKIndustryList().getJson()));
+            file.write(getJsListContent("USIndexETFListData", new GetUSIndexETFList().getJson()));
             file.flush();
 
             System.out.println("JS File written to " + jsFilePath);

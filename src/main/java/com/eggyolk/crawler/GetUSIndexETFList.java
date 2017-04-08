@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.*;
 
-public class GetUSSnPIndustryList implements GenericLabelList {
+public class GetUSIndexETFList implements GenericLabelList {
 
     public String getJson() throws Exception {
 
@@ -32,7 +32,7 @@ public class GetUSSnPIndustryList implements GenericLabelList {
 
             JSONObject cobj = new JSONObject();
             cobj.put("label", lbl.descEn);
-            cobj.put("code", id);
+            cobj.put("code", "US" + id);
 
             JSONArray jsonList = new JSONArray();
 
@@ -48,8 +48,6 @@ public class GetUSSnPIndustryList implements GenericLabelList {
             list.add(cobj);
 
             id++;
-            //System.out.print(me.getKey() + ": ");
-            //System.out.println(me.getValue());
         }
 
         return list.toJSONString();
@@ -61,6 +59,25 @@ public class GetUSSnPIndustryList implements GenericLabelList {
         ArrayList<Label> list  = new ArrayList();
 
         try {
+
+            // Add Dow 30 & Nasdaq first
+            Label lbl = new Label();
+            lbl.code = "The Dow 30";
+            lbl.descEn = "The Dow 30";
+            lbl.addInfo = "http://investsnips.com/dow-30/";
+            list.add(lbl);
+
+            lbl = new Label();
+            lbl.code = "NASDAQ 100";
+            lbl.descEn = "NASDAQ 100";
+            lbl.addInfo = "http://investsnips.com/the-nasdaq-100/";
+            list.add(lbl);
+
+            lbl = new Label();
+            lbl.code = "ETF 100";
+            lbl.descEn = "ETF 100";
+            lbl.addInfo = "http://etfdb.com/compare/volume/";
+            list.add(lbl);
 
             // need http protocol
             doc = Jsoup.connect("http://investsnips.com/list-of-sp-500-companies/").get();
@@ -74,9 +91,10 @@ public class GetUSSnPIndustryList implements GenericLabelList {
 
                 if (start_to_add) {
                     Element a = p.select("a").get(0);
-                    Label lbl = new Label();
+                    lbl = new Label();
+
                     lbl.code = a.text();
-                    lbl.descEn = a.text();
+                    lbl.descEn = "S&P500 - " + a.text();
                     lbl.addInfo = a.attr("href");
                     //System.out.println(lbl);
                     list.add(lbl);
@@ -105,21 +123,37 @@ public class GetUSSnPIndustryList implements GenericLabelList {
                 Document doc = Jsoup.connect(label.addInfo).get();
                 ArrayList<Label> sublist = new ArrayList();
 
-                Element div = doc.select("div.et_pb_text_0").get(0);
-                Elements links = div.select("a");
+                if (label.code.startsWith("ETF")) {
 
-                for (int i = 1; i < links.size(); i++) { // first row is the col names so skip it.
-                    Element a = links.get(i);
+                    Element tbody = doc.select("tbody").get(0);
+                    Elements rows = tbody.select("tr");
 
-                    //<p><a href="http://investsnips.com/boeing-company-the-ba/">Boeing Company (The) (BA)</a> (World’s largest aerospace company; commercial jetliners; defense, drones, space and security systems)</p>
-                    //System.out.println(a.text() + " - " + a.text().contains("("));
-                    if (a.text().contains("(") && a.text().contains(")")) {
+                    for (int i = 0; i < rows.size(); i++) {
+                        Element row = rows.get(i);
+                        Elements cols = row.select("td");
+
                         Label lbl = new Label();
-                        lbl.code = a.text().split("\\(")[1].split("\\)")[0];
-                        lbl.descEn = a.text();
-                        lbl.addInfo = a.text();
-                        //System.out.println(lbl);
+                        lbl.code = cols.get(0).text()  + ".US";
+                        lbl.descEn = cols.get(1).text();
                         sublist.add(lbl);
+                    }
+                } else {
+                    Element div = doc.select("div.et_pb_text_0").get(0);
+                    Elements links = div.select("a");
+
+                    for (int i = 0; i < links.size(); i++) {
+                        Element a = links.get(i);
+
+                        //<p><a href="http://investsnips.com/boeing-company-the-ba/">Boeing Company (The) (BA)</a> (World’s largest aerospace company; commercial jetliners; defense, drones, space and security systems)</p>
+                        //System.out.println(a.text() + " - " + a.text().contains("("));
+                        if (a.text().contains("(") && a.text().contains(")")) {
+                            Label lbl = new Label();
+                            lbl.code = a.text().split("\\(")[1].split("\\)")[0] + ".US";
+                            lbl.descEn = a.text();
+                            lbl.addInfo = a.text();
+                            //System.out.println(lbl);
+                            sublist.add(lbl);
+                        }
                     }
                 }
 
@@ -137,7 +171,7 @@ public class GetUSSnPIndustryList implements GenericLabelList {
 
     public static void main(String[] args) throws Exception {
 
-        GenericLabelList list = new GetUSSnPIndustryList();
+        GenericLabelList list = new GetUSIndexETFList();
         System.out.println(list.getJson());
     }
 }

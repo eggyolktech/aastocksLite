@@ -2,6 +2,7 @@ package com.eggyolk.crawler;
 
 import com.eggyolk.vo.Label;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * Created by Hin on 4/3/2017.

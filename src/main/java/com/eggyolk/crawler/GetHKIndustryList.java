@@ -16,7 +16,7 @@ public class GetHKIndustryList implements GenericLabelList {
     public String getJson() throws Exception {
 
         JSONArray list = new JSONArray();
-        LinkedHashMap map = this.getIndustryMap();
+        LinkedHashMap map = this.getMap();
 
         // Get a set of the entries
         Set set = map.entrySet();
@@ -90,13 +90,13 @@ public class GetHKIndustryList implements GenericLabelList {
         return list;
     }
 
-    public LinkedHashMap getIndustryMap() throws Exception {
+    public LinkedHashMap getMap() throws Exception {
 
         // Create a hash map
         LinkedHashMap lhm = new LinkedHashMap();
         ArrayList<Label> list = this.getList();
 
-        this.getList().stream().forEach((label) -> {
+        list.stream().forEach((label) -> {
             //System.out.println(label);
 
             try {

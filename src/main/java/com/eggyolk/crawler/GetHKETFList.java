@@ -18,7 +18,7 @@ public class GetHKETFList implements GenericLabelList {
         JSONArray list = new JSONArray();
 
         (new GetHKETFList()).getList().stream().forEach((label) -> {
-            System.out.println(label);
+            //System.out.println(label);
             JSONObject cobj = new JSONObject();
             cobj.put("label", label.descZh);
             cobj.put("code", label.code);
@@ -40,7 +40,7 @@ public class GetHKETFList implements GenericLabelList {
 
             // get page title
             String title = doc.title();
-            System.out.println("title : " + title);
+            //System.out.println("title : " + title);
 
             Element table = doc.select("table#tabETF1").get(0);
             Elements rows = table.select("tr");

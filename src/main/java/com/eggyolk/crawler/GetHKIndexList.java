@@ -9,21 +9,48 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 public class GetHKIndexList implements GenericLabelList {
 
     public String getJson() throws Exception {
 
         JSONArray list = new JSONArray();
+        LinkedHashMap map = this.getMap();
 
-        (new GetHKIndexList()).getList().stream().forEach((label) -> {
-            System.out.println(label);
+        // Get a set of the entries
+        Set set = map.entrySet();
+
+        // Get an iterator
+        Iterator i = set.iterator();
+
+        // Display elements
+        while(i.hasNext()) {
+            Map.Entry me = (Map.Entry)i.next();
+            Label lbl = (Label) me.getKey();
+            ArrayList<Label> indlist = (ArrayList<Label>) me.getValue();
+
             JSONObject cobj = new JSONObject();
-            cobj.put("label", label.descZh);
-            cobj.put("code", label.code);
+            cobj.put("label", lbl.descZh);
+            cobj.put("code", lbl.code);
+
+            JSONArray jsonList = new JSONArray();
+
+            indlist.stream().forEach((label) -> {
+
+                JSONObject iobj = new JSONObject();
+                iobj.put("label", label.descZh);
+                iobj.put("code", label.code);
+                jsonList.add(iobj);
+            });
+
+            cobj.put("list", jsonList);
             list.add(cobj);
-        });
+
+
+            //System.out.print(me.getKey() + ": ");
+            //System.out.println(me.getValue());
+        }
 
         return list.toJSONString();
     }
@@ -31,114 +58,82 @@ public class GetHKIndexList implements GenericLabelList {
     public ArrayList<Label> getList() throws Exception {
 
         Document doc;
-        ArrayList<String> codeList = new ArrayList();
-        ArrayList<String> textList = new ArrayList();
+        ArrayList<Label> list  = new ArrayList();
 
         try {
 
             // need http protocol
-            doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/market/index/hk-index.aspx").get();
+            doc = Jsoup.connect("http://www.etnet.com.hk/www/tc/stocks/indexes_main.php").get();
 
             // get page title
             String title = doc.title();
             //System.out.println("title : " + title);
 
-            //<a href="http://www.aastocks.com/tc/stock/DetailChart.aspx?symbol=110000" class="a15"><div class="float_l icon-box icon-chart"></div></a>
-            Elements links = doc.select("a[href*=DetailChart.aspx?symbol]");
-            for (Element link : links) {
-                // get the value from href attribute
-                //System.out.println("code : " + link.attr("href").split("=")[1]);
-                codeList.add(link.attr("href").split("=")[1]);
+            Element select = doc.select("div#SectionMenu").get(0);
+            Elements links = select.select("a");
+
+            for (int i = 1; i < links.size(); i++) { // first row is the col names so skip it.
+                Element a = links.get(i);
+                //System.out.println(a.text() + " - " + (a.attr("href")));
+
+                if (a.attr("href").contains("indexes_detail.php?subtype")) {
+                    Label lbl = new Label();
+                    lbl.code = a.attr("href").split("=")[1];
+                    lbl.descZh = a.text();
+                    lbl.addInfo ="";
+                    list.add(lbl);
+                    //System.out.println(lbl);
+                }
             }
-
-            // <a href="/tc/stocks/market/index/hk-index-con.aspx?index=HSI" class="a15"><div class="float_">恆生指數</div></a>
-            links = doc.select("a[href*=hk-index-con.aspx?index]");
-            for (Element link : links) {
-                // get the value from href attribute
-                //System.out.println("text : " + link.text());
-                textList.add(link.text());
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/market/index/world-index.aspx").get();
-
-            // get page title
-            title = doc.title();
-            //System.out.println("\ntitle : " + title);
-
-            //<a href="http://www.aastocks.com/tc/stock/DetailChart.aspx?symbol=111000"><div class="float_l icon-box icon-chart"></div></a>
-            links = doc.select("a[href*=DetailChart.aspx?symbol]");
-            for (Element link : links) {
-                // get the value from href attribute
-                //System.out.println("code : " + link.attr("href").split("=")[1]);
-                codeList.add(link.attr("href").split("=")[1]);
-            }
-
-            //<span class="float_l" style="line-height:20px;">道瓊斯</span>
-            Elements spans = doc.select("span.float_l");
-
-            int currentPos = 0;
-            for (Element span : spans) {
-                // get the value from href attribute
-                //System.out.println("text : " + span.text());
-                textList.add(span.text());
-                currentPos++;
-
-                if(currentPos >= links.size())
-                    break;
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/market/index/china-index.aspx").get();
-
-            // get page title
-            title = doc.title();
-            //System.out.println("\ntitle : " + title);
-
-            //<a href="http://www.aastocks.com/tc/stock/DetailChart.aspx?symbol=111000"><div class="float_l icon-box icon-chart"></div></a>
-            links = doc.select("a[href*=DetailChart.aspx?symbol]");
-            for (Element link : links) {
-                // get the value from href attribute
-                //System.out.println("code : " + link.attr("href").split("=")[1]);
-                codeList.add(link.attr("href").split("=")[1]);
-            }
-
-            //<span class="float_l" style="line-height:20px;">道瓊斯</span>
-            spans = doc.select("span.float_l");
-
-            currentPos = 0;
-            for (Element span : spans) {
-                // get the value from href attribute
-                //System.out.println("text : " + span.text());
-                textList.add(span.text());
-                currentPos++;
-
-                if(currentPos >= links.size())
-                    break;
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
             throw e;
         }
 
-        ArrayList<Label> indexList  = new ArrayList();
+        return list;
+    }
 
-        for (int i=0; i< codeList.size(); i++) {
-            Label lbl = new Label();
-            lbl.code = codeList.get(i);
-            lbl.descZh = textList.get(i);
-            indexList.add(lbl);
-        }
+    public LinkedHashMap getMap() throws Exception {
 
-        return indexList;
+        // Create a hash map
+        LinkedHashMap lhm = new LinkedHashMap();
+        ArrayList<Label> list = this.getList();
+
+        list.stream().forEach((label) -> {
+
+            try {
+
+                Document doc = Jsoup.connect("http://www.etnet.com.hk/www/tc/stocks/indexes_detail.php?subtype=" + label.code).get();
+                ArrayList<Label> sublist = new ArrayList();
+
+                Element table = doc.select("table[class=figureTable]").get(0);
+                Elements rows = table.select("tr");
+
+                for (int i = 1; i < rows.size(); i++) { // first row is the col names so skip it.
+                    Element row = rows.get(i);
+                    Elements cols = row.select("td");
+
+                    Label lbl = new Label();
+                    lbl.code = cols.get(0).text();
+                    lbl.descZh = cols.get(1).text();
+                    sublist.add(lbl);
+                }
+
+                System.out.println(label.descZh + "/" + label.code + ": [" + sublist.size() + " record(s)]");
+
+                lhm.put(label, sublist);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return lhm;
     }
 
     public static void main(String[] args) throws Exception {
 
         GenericLabelList list = new GetHKIndexList();
-        list.getList().stream().forEach((label) -> {
-            System.out.println(label);
-        });
+        System.out.println(list.getJson());
     }
 }
