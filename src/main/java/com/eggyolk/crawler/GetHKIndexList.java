@@ -72,7 +72,7 @@ public class GetHKIndexList implements GenericLabelList {
             Element select = doc.select("div#SectionMenu").get(0);
             Elements links = select.select("a");
 
-            for (int i = 1; i < links.size(); i++) { // first row is the col names so skip it.
+            for (int i = 0; i < links.size(); i++) { // first row is the col names so skip it.
                 Element a = links.get(i);
                 //System.out.println(a.text() + " - " + (a.attr("href")));
 
@@ -81,7 +81,10 @@ public class GetHKIndexList implements GenericLabelList {
                     lbl.code = a.attr("href").split("=")[1];
                     lbl.descZh = a.text();
                     lbl.addInfo ="";
-                    list.add(lbl);
+
+                    // exclude mainland indexes
+                    if (!lbl.code.equalsIgnoreCase("cesa80"))
+                        list.add(lbl);
                     //System.out.println(lbl);
                 }
             }

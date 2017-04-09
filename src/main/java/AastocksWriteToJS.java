@@ -33,7 +33,7 @@ public class AastocksWriteToJS {
             file.write(getJsListContent("blueChipData", new GetHKBlueChipList().getJson()));
             file.write(getJsListContent("indexListData", new GetHKIndexList().getJson()));
             file.write(getJsListContent("industryData", new GetHKIndustryList().getJson()));
-            file.write(getJsListContent("USIndexETFListData", new GetUSIndexETFList().getJson()));
+            file.write(getJsListContent("usIndexETFListData", new GetUSIndexETFList().getJson()));
             file.flush();
 
             System.out.println("JS File written to " + jsFilePath);

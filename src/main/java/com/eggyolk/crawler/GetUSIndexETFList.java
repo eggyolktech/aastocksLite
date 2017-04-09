@@ -94,7 +94,7 @@ public class GetUSIndexETFList implements GenericLabelList {
                     lbl = new Label();
 
                     lbl.code = a.text();
-                    lbl.descEn = "S&P500 - " + a.text();
+                    lbl.descEn = "SPX " + a.text();
                     lbl.addInfo = a.attr("href");
                     //System.out.println(lbl);
                     list.add(lbl);

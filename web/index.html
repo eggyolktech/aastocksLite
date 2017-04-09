@@ -41,6 +41,16 @@
         color: yellow;
     }
     
+    #backtotop { 
+        height: 20px; 
+        position: fixed;
+        left:90%;
+        bottom:2%;
+        width:10%; 
+        background-color: white;
+        opacity: 100;
+    }
+    
   </style>
 
   <title>Aastocks Lite</title>
@@ -66,15 +76,22 @@ http://charts.aastocks.com/servlet/Charts?com=100&logoStyle=1&chartwidth=672&cha
 var url = main + indicator + subchart + scheme + period + id
 var url_ind = main + indicator + subchart + subchart_coldfeet + scheme_single + period + id
 
+function isHavingAlpha(input) {
+    return /[a-zA-Z]/i.test(input);
+}
+
 function displaySingleChart(code){
 
     if (code) {
     
         var isUS = false;
 
-        if (!/[^a-zA-Z]/.test(code)) {
-            code = code + ".US";
+        if (isHavingAlpha(code)) {
+            
             isUS = true;
+        
+            if (!code.includes(".US"))
+                code = code + ".US";
         }
     
         $("#tfBar").hide();
@@ -89,7 +106,7 @@ function displaySingleChart(code){
         }); 
 
         $("#chartDiv").empty().append(images);
-        $("#anchorDiv").empty()
+        $("#anchorDiv").empty();
     }
 }
 
@@ -112,6 +129,7 @@ function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset ) {
             // Nill case
             return;
         } else if (code == "ALL") {
+            
             // List all cases
             $("#tfBar").show();
             $("#inputCode").val("");
@@ -126,6 +144,12 @@ function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset ) {
             
             $("#anchorDiv").empty().append(anchors);            
             $("#chartDiv").empty().append(images);  
+            
+            // Double Click Chart goes to single detail page
+            $('img[id^="chart"]').dblclick(function() {
+                var sCode = $(this).attr("src").split("=").pop();
+                displaySingleChart(sCode);
+            });
   
         } else {
             // List Individual cases
@@ -163,53 +187,107 @@ $(window).load(function(){
 
     //////// Index Dropdown List
     createDropdownMenu("drpIndex", indexData, "指數");
- 
-    //////// Bluechip Dropdown List
-    createDropdownMenu("drpBluechip", blueChipData, "指數成分股");
     
-    //////// Industry Dropdown List
+    //////// HK Indexes/EFT/Industry Dropdown List
+    optionsIndex = $.map(indexListData.list, function (item, i) {
+        return $('<option>', { text: item.label, value: item.code });
+    }); 
+    
+    optionETF = $('<option>', { text: "ETF", value: "ETF" });
+
     optionsIndustry = $.map(industryData.list, function (item, i) {
         return $('<option>', { text: item.label, value: item.code });
     }); 
-
-    optionETF = $('<option>', { text: "ETF", value: "ETF" });
-    
-    $("#drpIndustry").empty()
+  
+    $("#drpStockGroup").empty()
         .append($('<option>', { text: "股票分類", value: "" }))
+        .append($('<option>', { text: "-------- 指數分類 --------", value: "" }))
+        .append(optionsIndex)
+        .append($('<option>', { text: "-------- 行業分類 --------", value: "" }))
         .append(optionETF)
         .append(optionsIndustry);      
         
-    $(document).on('change','#drpIndustry' ,function(){
+    $(document).on('change','#drpStockGroup' ,function(){
         
         var code = this.value;
         
         if (code == "") {
             // Nill case
         } else if (code == "ETF") {        
-             //////// Create ETF Sub Dropdown List
-            createDropdownMenu("drpIndustrySub", etfData, "請選擇", "drpIndustry");
+            //////// Create ETF Sub Dropdown List
+            createDropdownMenu("drpStockGroupSub", etfData, CAPTION_SELECT, "drpStockGroup");
+            
+        } else if (isHavingAlpha(code)) {
+            ///////// Generate Indexes Dropdown List
+            var filteredIndexList = $(indexListData.list).filter(function( idx ) {
+                return indexListData.list[idx].code == code;
+            }); 
+            
+            ///////// Create Indexes Sub Dropdown List
+            createDropdownMenu("drpStockGroupSub", filteredIndexList[0], CAPTION_SELECT, "drpStockGroup");     
+
         } else {
         
-            // Generate Sub Industry List  
+            ///////// Generate Sub Industry List  
             var filteredIndustry = $(industryData.list).filter(function( idx ) {
                 return industryData.list[idx].code == code;
             }); 
             
             //////// Create Industry Sub Dropdown List
-            createDropdownMenu("drpIndustrySub", filteredIndustry[0], "請選擇", "drpIndustry");            
+            createDropdownMenu("drpStockGroupSub", filteredIndustry[0], CAPTION_SELECT, "drpStockGroup");            
         }
     });
     
+    //////// US Indexes/EFT/Industry Dropdown List
+    options = $.map(usIndexETFListData.list, function (item, i) {
+        return $('<option>', { text: item.label, value: item.code });
+    }); 
+     
+    $("#drpUSStockGroup").empty()
+        .append($('<option>', { text: "US Stocks Select", value: "" }))
+        .append(options);      
+        
+    $(document).on('change','#drpUSStockGroup' ,function(){
+        
+        var code = this.value;
+        
+        if (code == "") {
+            // Nill case
+        } else {
+        
+            ///////// Generate Sub Industry List  
+            var filteredList = $(usIndexETFListData.list).filter(function( idx ) {
+                return usIndexETFListData.list[idx].code == code;
+            }); 
+            
+            //////// Create Industry Sub Dropdown List
+            createDropdownMenu("drpUSStockGroupSub", filteredList[0], CAPTION_SELECT_EN, "drpUSStockGroup");            
+        }
+    });    
+    
     //////// Time Frame Toggle (for ALL Case)
-    var links = $.map(tfPeriod.list, function ( item, i)  {        
+    var list = tfPeriod.list;
+    var links = $.map(list, function ( item, i)  {        
         return $('<a>', { id: 'tf_' + item.period, href: "#", text: item.timeframe });
     }); 
     $("#tfBar").empty().append(links);
  
-    $(document).on('click', 'a[id^="tf"]', function(){        
+    $(document).on('click', 'a[id^="tf"]', function(){
+    
+        var isUS = ($("#drpUSStockGroup").val() != "");
         var new_period = this.id.replace("tf_","");
+        
+        if (isUS) {       
+            var tfText = this.text;
+            var tf = $(tfUSPeriod.list).filter(function( idx ) {
+                //alert("[" + tfUSPeriod.list[idx].timeframe + "], [" + tfText + "]");            
+                return tfUSPeriod.list[idx].timeframe == tfText;
+            }); 
+            
+            new_period = tf[0].period;
+        }
+        
         var first_chart_code = $('img[id^="chart"]').first().attr("id").replace("chart","");
-        //alert(first_chart_code);
         
         $('img[id^="chart"]').filter(
             function(){
@@ -218,7 +296,7 @@ $(window).load(function(){
                 $(this).attr("src", src);
         });
     }); 
-
+    
 }); //]]> 
 
 </script>
@@ -227,23 +305,20 @@ $(window).load(function(){
 </head>
 
 <body>
+    <div id="top"></div>
+    <div id="backtotop"><a href="#top">Top</a></div>
     <table>
         <tr>
             <td>
                 <input type="text" id="inputCode" size="10" style="font-size: 12px;">
             </td>            
             <td><select id="drpIndex"></select></td>
-            <td><select id="drpBluechip"></select></td>
-            <td><select id="drpIndustry"></select></td>
-            <td><select id="drpIndustrySub"></select></td>
+            <td><select id="drpStockGroup"></select></td>
+            <td><select id="drpStockGroupSub"></select></td>
+            <td><select id="drpUSStockGroup"></select></td>
+            <td><select id="drpUSStockGroupSub"></select></td>            
             <td>
-                <div id="tfBar">
-                    <!--a id="tfM" href="#">M</a>
-                    <a id="tfW" href="#">W</a>
-                    <a id="tfD" href="#">D</a>
-                    <a id="tfh" href="#">h</a>
-                    <a id="tfm" href="#">m</-->
-                </div>
+                <div id="tfBar"></div>
             </td>
         </tr>
     </table>
