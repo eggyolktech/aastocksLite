@@ -178,10 +178,39 @@ $(window).load(function(){
             } 
             
             $('select[id^="drp"]').prop('selectedIndex',0);
-           
-            // List Individual cases
-            displaySingleChart($("#inputCode").val());
-            $("#inputCode").select();
+            
+            var input = $("#inputCode").val();
+            
+            if (input.startsWith("/")) {
+            
+                // Search Case
+                var searchLabel = input.replace("/","");
+                $("#chartDiv").empty()
+                $("#searchDiv").empty()
+                
+                $.map(usIndexETFListData.list, function ( listitem, i)  {        
+                    $.map(listitem.list, function ( item, i)  {                        
+                        if (item.label.search(new RegExp(searchLabel, "i")) != -1) {                        
+                            var link = $('<a>', { href: '#', text: listitem.label + " > " + item.label, onclick: "javascript:displaySingleChart('" + item.code + "')" });
+                            $("#searchDiv").append(link).append('<p/>');                           
+                        }                            
+                    });        
+                }); 
+            
+                $.map(industryData.list, function ( listitem, i)  {        
+                    $.map(listitem.list, function ( item, i)  {                        
+                        if (item.label.search(new RegExp(searchLabel, "i")) != -1) {                        
+                            var link = $('<a>', { href: '#', text: listitem.label + " > " + item.label + " (" + item.code +")", onclick: "javascript:displaySingleChart('" + item.code + "')" });
+                            $("#searchDiv").append(link).append('<p/>');                           
+                        }                            
+                    });        
+                }); 
+            
+            } else {            
+                // List Individual cases
+                displaySingleChart($("#inputCode").val());
+                $("#inputCode").select();
+            }
         } 
     });
 
@@ -327,7 +356,7 @@ $(window).load(function(){
     <div id="anchorDiv"></div>
     <p id="spacer"/>
     <div id="chartDiv"><img src="./images/enter.png" width="21"/></div>
-
+    <div id="searchDiv"></div>
 </body>
 
 </html>

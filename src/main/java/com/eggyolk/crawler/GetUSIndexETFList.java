@@ -148,11 +148,15 @@ public class GetUSIndexETFList implements GenericLabelList {
                         //System.out.println(a.text() + " - " + a.text().contains("("));
                         if (a.text().contains("(") && a.text().contains(")")) {
                             Label lbl = new Label();
-                            lbl.code = a.text().split("\\(")[1].split("\\)")[0] + ".US";
+                            String[] str = a.text().split("\\(");
+
+                            lbl.code = str[str.length-1].split("\\)")[0] + ".US";
                             lbl.descEn = a.text();
                             lbl.addInfo = a.text();
-                            //System.out.println(lbl);
-                            sublist.add(lbl);
+
+                            if (!lbl.code.contains(" ")) {
+                                sublist.add(lbl);
+                            }
                         }
                     }
                 }
