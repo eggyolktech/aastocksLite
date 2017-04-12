@@ -11,13 +11,13 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class GetHKHSIIndexList implements GenericLabelList {
+public class GetHKMajorIndexList implements GenericLabelList {
 
     public String getJson() throws Exception {
 
         JSONArray list = new JSONArray();
 
-        (new GetHKHSIIndexList()).getList().stream().forEach((label) -> {
+        (new GetHKMajorIndexList()).getList().stream().forEach((label) -> {
             System.out.println(label);
             JSONObject cobj = new JSONObject();
             cobj.put("label", label.descZh);
@@ -138,7 +138,7 @@ public class GetHKHSIIndexList implements GenericLabelList {
 
     public static void main(String[] args) throws Exception {
 
-        GenericLabelList list = new GetHKHSIIndexList();
+        GenericLabelList list = new GetHKMajorIndexList();
         list.getList().stream().forEach((label) -> {
             System.out.println(label);
         });

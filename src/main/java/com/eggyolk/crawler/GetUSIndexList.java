@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.*;
 
-public class GetUSIndexETFList implements GenericLabelList {
+public class GetUSIndexList implements GenericLabelList {
 
     public String getJson() throws Exception {
 
@@ -73,11 +73,13 @@ public class GetUSIndexETFList implements GenericLabelList {
             lbl.addInfo = "http://investsnips.com/the-nasdaq-100/";
             list.add(lbl);
 
+            /*
             lbl = new Label();
             lbl.code = "ETF 100";
             lbl.descEn = "ETF 100";
             lbl.addInfo = "http://etfdb.com/compare/volume/";
             list.add(lbl);
+            */
 
             // need http protocol
             doc = Jsoup.connect("http://investsnips.com/list-of-sp-500-companies/").get();
@@ -175,7 +177,7 @@ public class GetUSIndexETFList implements GenericLabelList {
 
     public static void main(String[] args) throws Exception {
 
-        GenericLabelList list = new GetUSIndexETFList();
+        GenericLabelList list = new GetUSIndexList();
         System.out.println(list.getJson());
     }
 }
