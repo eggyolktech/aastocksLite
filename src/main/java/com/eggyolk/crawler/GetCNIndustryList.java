@@ -134,7 +134,7 @@ public class GetCNIndustryList implements GenericLabelList {
                 if (sublist.size() > 0) {
                     lhm.put(label, sublist);
                 }
-                
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

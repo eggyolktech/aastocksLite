@@ -96,7 +96,7 @@ public class GetUSIndexList implements GenericLabelList {
                     lbl = new Label();
 
                     lbl.code = a.text();
-                    lbl.descEn = "SPX " + a.text();
+                    lbl.descEn = "SPX500 " + a.text();
                     lbl.addInfo = a.attr("href");
                     //System.out.println(lbl);
                     list.add(lbl);

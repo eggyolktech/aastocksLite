@@ -164,6 +164,18 @@ function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset ) {
     });
 }
 
+function displaySearchResult(list, searchLabel) {
+
+    $.map(list, function ( listitem, i)  {        
+        $.map(listitem.list, function ( item, i)  {                        
+            if (item.label.search(new RegExp(searchLabel, "i")) != -1) {                        
+                var link = $('<a>', { href: '#', text: listitem.label + " > " + item.label, onclick: "javascript:displaySingleChart('" + item.code + "')" });
+                $("#searchDiv").append(link).append('<p/>');                           
+            }                            
+        });        
+    }); 
+}
+
 $(window).load(function(){
 
     //////// Input Code Box
@@ -185,26 +197,17 @@ $(window).load(function(){
             
                 // Search Case
                 var searchLabel = input.replace("/","");
+                $("#anchorDiv").empty()
                 $("#chartDiv").empty()
                 $("#searchDiv").empty()
                 
-                $.map(usIndexETFListData.list, function ( listitem, i)  {        
-                    $.map(listitem.list, function ( item, i)  {                        
-                        if (item.label.search(new RegExp(searchLabel, "i")) != -1) {                        
-                            var link = $('<a>', { href: '#', text: listitem.label + " > " + item.label, onclick: "javascript:displaySingleChart('" + item.code + "')" });
-                            $("#searchDiv").append(link).append('<p/>');                           
-                        }                            
-                    });        
-                }); 
-            
-                $.map(industryData.list, function ( listitem, i)  {        
-                    $.map(listitem.list, function ( item, i)  {                        
-                        if (item.label.search(new RegExp(searchLabel, "i")) != -1) {                        
-                            var link = $('<a>', { href: '#', text: listitem.label + " > " + item.label + " (" + item.code +")", onclick: "javascript:displaySingleChart('" + item.code + "')" });
-                            $("#searchDiv").append(link).append('<p/>');                           
-                        }                            
-                    });        
-                }); 
+                displaySearchResult(usIndexListData.list, searchLabel);
+                displaySearchResult(usIndustryListData.list, searchLabel);
+                displaySearchResult(usETFListData.list, searchLabel);
+                displaySearchResult(indexListData.list, searchLabel);
+                displaySearchResult(industryData.list, searchLabel);
+                displaySearchResult(industryData.list, searchLabel);
+                displaySearchResult(etfData.list, searchLabel);
             
             } else {            
                 // List Individual cases

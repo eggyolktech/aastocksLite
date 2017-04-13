@@ -29,11 +29,15 @@ public class AastocksWriteToJS {
         try (FileWriter file = new FileWriter(jsFilePath)) {
 
             file.write(getJsListContent("indexData", new GetHKMajorIndexList().getJson()));
-            file.write(getJsListContent("etfData", new GetHKETFList().getJson()));
-            file.write(getJsListContent("blueChipData", new GetHKBlueChipList().getJson()));
+            //file.write(getJsListContent("blueChipData", new GetHKBlueChipList().getJson()));
             file.write(getJsListContent("indexListData", new GetHKIndexList().getJson()));
+            file.write(getJsListContent("etfData", new GetHKETFList().getJson()));
             file.write(getJsListContent("industryData", new GetHKIndustryList().getJson()));
+
+            file.write(getJsListContent("cnIndustryData", new GetCNIndustryList().getJson()));
+
             file.write(getJsListContent("usIndexListData", new GetUSIndexList().getJson()));
+            file.write(getJsListContent("usETFListData", new GetUSETFList().getJson()));
             file.write(getJsListContent("usIndustryListData", new GetUSIndustryList().getJson()));
             file.flush();
 
