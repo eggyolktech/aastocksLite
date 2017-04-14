@@ -7,9 +7,9 @@ jsonpath=C:\\Users\\Hin\\djangodev\\pricewatch\\data\\
 jsonfile=list_{0}.json
 
 # FTP Information
-server=ftp.heyaforum.net
-user=heyaforumn
-pass=Myhome123
+server=[FTP_SERVER]
+user=[FTP_LOGIN]
+pass=[FTP_PASS]
 
-remoterootdir=/domains/heyaforum.net/public_html
+remoterootdir=[FTP_REMOTE_ROOT_DIR]
 remoteparentfolder=stock

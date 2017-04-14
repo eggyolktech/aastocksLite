@@ -32,7 +32,7 @@ public class GetUSIndustryList implements GenericLabelList {
 
             JSONObject cobj = new JSONObject();
             cobj.put("label", lbl.descEn);
-            cobj.put("code", "US" + id);
+            cobj.put("code", "USIND" + id);
 
             JSONArray jsonList = new JSONArray();
 
@@ -72,18 +72,11 @@ public class GetUSIndustryList implements GenericLabelList {
 
                 lbl.code = a.text();
                 lbl.descEn = a.text();
-                if( lbl.code.equalsIgnoreCase("Biotechnology"))
+                if( lbl.descEn.equalsIgnoreCase("Biotechnology"))
                     lbl.addInfo = "http://investsnips.com/list-of-publicly-traded-large-cap-diversified-biotechnology-and-pharmaceutical-companies/";
-                else if (lbl.code.contains("Medical Device"))
-                    lbl.addInfo = "http://investsnips.com/list-of-publicly-traded-large-cap-diversified-medical-equipment-and-device-companies/";
-                else if (lbl.code.contains("Pharmaceuticals"))
-                    lbl.addInfo = "http://investsnips.com/publicly-traded-large-cap-pharmaceutical-companies/";
-                else if (lbl.code.contains("Software"))
-                    lbl.addInfo = "http://investsnips.com/list-of-publicly-traded-large-cap-software-and-technology-service-companies/";
-                else if (lbl.code.contains("Technology"))
-                    lbl.addInfo = "http://investsnips.com/list-of-publicly-traded-large-cap-diversified-medical-equipment-and-device-companies/";
                 else
                     lbl.addInfo = a.attr("href");
+                //System.out.println(lbl);
                 list.add(lbl);
             }
 
@@ -96,7 +89,17 @@ public class GetUSIndustryList implements GenericLabelList {
 
                 lbl.code = a.text();
                 lbl.descEn = a.text();
-                lbl.addInfo = a.attr("href");
+
+                if (lbl.descEn.contains("Medical Device"))
+                    lbl.addInfo = "http://investsnips.com/list-of-publicly-traded-large-cap-diversified-medical-equipment-and-device-companies/";
+                else if (lbl.descEn.contains("Pharmaceuticals"))
+                    lbl.addInfo = "http://investsnips.com/publicly-traded-large-cap-pharmaceutical-companies/";
+                else if (lbl.descEn.contains("Software"))
+                    lbl.addInfo = "http://investsnips.com/list-of-publicly-traded-large-cap-software-and-technology-service-companies/";
+                else if (lbl.descEn.contains("Technology"))
+                    lbl.addInfo = "http://investsnips.com/list-of-publicly-traded-large-cap-diversified-medical-equipment-and-device-companies/";
+                else
+                    lbl.addInfo = a.attr("href");
                 //System.out.println(lbl);
                 list.add(lbl);
             }

@@ -85,8 +85,23 @@ function displaySingleChart(code){
     if (code) {
     
         var isUS = false;
+        var isCN = false;
 
-        if (isHavingAlpha(code)) {
+        if (code.endsWith(".SH") || code.endsWith(".SZ")) {
+            
+            isCN = true;
+        
+        } else if (/^\d+$/.test(code) && code.length == 6 && code.startsWith("1")) {
+        
+            if (("111100,111000").includes(code)) isUS = true;
+        
+        } else if (/^\d+$/.test(code) && (code.length == 6 || code.length == 7)) {
+            
+            isCN = true;
+            if (code.startsWith("6")) code = code + ".SH";
+            else if (code.startsWith("0") || code.startsWith("3")) code = code + ".SZ";
+        
+        } else if (isHavingAlpha(code)) {
             
             isUS = true;
         
@@ -99,6 +114,7 @@ function displaySingleChart(code){
         
         var list = tfPeriod.list;
         if (isUS) list = tfUSPeriod.list;
+        else if (isCN) list = tfCNPeriod.list;
         
         var images = $.map(list, function ( item, i) {        
             var regex = /(period=)\d+/;
@@ -124,6 +140,7 @@ function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset ) {
     $(document).on('change','#' + drpId ,function(){
         
         var code = this.value;
+        $("#searchDiv").empty();
         
         if (code == "") {
             // Nill case
@@ -134,8 +151,9 @@ function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset ) {
             $("#tfBar").show();
             $("#inputCode").val("");
             
-            var anchors = $.map(drpData.list, function ( item, i) {
-                return $('<a>', { href: '#chart' + item.code, text: item.label });
+            var anchors = $.map(drpData.list, function ( item, i) {            
+                var addInfo = (typeof item.addInfo != "undefined")? " (" + item.addInfo + ")":"";                            
+                return $('<a>', { href: '#chart' + item.code, text: item.code + " - " + item.label + addInfo });
             });
             
             var images = $.map(drpData.list, function ( item, i) {
@@ -169,7 +187,7 @@ function displaySearchResult(list, searchLabel) {
     $.map(list, function ( listitem, i)  {        
         $.map(listitem.list, function ( item, i)  {                        
             if (item.label.search(new RegExp(searchLabel, "i")) != -1) {                        
-                var link = $('<a>', { href: '#', text: listitem.label + " > " + item.label, onclick: "javascript:displaySingleChart('" + item.code + "')" });
+                var link = $('<a>', { href: '#', text: item.code + ": " + listitem.label + " > " + item.label, onclick: "javascript:displaySingleChart('" + item.code + "')" });
                 $("#searchDiv").append(link).append('<p/>');                           
             }                            
         });        
@@ -197,21 +215,24 @@ $(window).load(function(){
             
                 // Search Case
                 var searchLabel = input.replace("/","");
-                $("#anchorDiv").empty()
-                $("#chartDiv").empty()
-                $("#searchDiv").empty()
+                $("#anchorDiv").empty();
+                $("#chartDiv").empty();
+                $("#searchDiv").empty();
                 
+                $("#searchDiv").append("<p>Search Result for [" + searchLabel + "]:</p>");
                 displaySearchResult(usIndexListData.list, searchLabel);
                 displaySearchResult(usIndustryListData.list, searchLabel);
                 displaySearchResult(usETFListData.list, searchLabel);
                 displaySearchResult(indexListData.list, searchLabel);
-                displaySearchResult(industryData.list, searchLabel);
-                displaySearchResult(industryData.list, searchLabel);
-                displaySearchResult(etfData.list, searchLabel);
+                displaySearchResult(industryListData.list, searchLabel);
+                displaySearchResult(etfListData.list, searchLabel);
+                displaySearchResult(cnIndexListData.list, searchLabel);
+                $("#searchDiv").append("<hr/>");
             
             } else {            
                 // List Individual cases
                 displaySingleChart($("#inputCode").val());
+                $("#searchDiv").empty();
                 $("#inputCode").select();
             }
         } 
@@ -223,21 +244,31 @@ $(window).load(function(){
     //////// HK Indexes/EFT/Industry Dropdown List
     optionsIndex = $.map(indexListData.list, function (item, i) {
         return $('<option>', { text: item.label, value: item.code });
-    }); 
-    
-    optionETF = $('<option>', { text: "ETF", value: "ETF" });
+    });
 
-    optionsIndustry = $.map(industryData.list, function (item, i) {
+    optionsETF = $.map(etfListData.list, function (item, i) {
+        return $('<option>', { text: item.label, value: item.code });
+    });    
+    
+    optionsIndustry = $.map(industryListData.list, function (item, i) {
         return $('<option>', { text: item.label, value: item.code });
     }); 
-  
+
+    optionsCnIndex = $.map(cnIndexListData.list, function (item, i) {
+        return $('<option>', { text: item.label, value: item.code });
+    });    
+    
+    
     $("#drpStockGroup").empty()
         .append($('<option>', { text: "股票分類", value: "" }))
-        .append($('<option>', { text: "-------- 指數分類 --------", value: "" }))
+        .append($('<option>', { text: "-------- 港股指數 --------", value: "" }))
         .append(optionsIndex)
-        .append($('<option>', { text: "-------- 行業分類 --------", value: "" }))
-        .append(optionETF)
-        .append(optionsIndustry);      
+        .append($('<option>', { text: "-------- 港股ETF --------", value: "" }))
+        .append(optionsETF)
+        .append($('<option>', { text: "-------- 港股行業 --------", value: "" }))
+        .append(optionsIndustry)
+        .append($('<option>', { text: "-------- 滬深指數 --------", value: "" }))
+        .append(optionsCnIndex);        
         
     $(document).on('change','#drpStockGroup' ,function(){
         
@@ -245,39 +276,70 @@ $(window).load(function(){
         
         if (code == "") {
             // Nill case
-        } else if (code == "ETF") {        
-            //////// Create ETF Sub Dropdown List
-            createDropdownMenu("drpStockGroupSub", etfData, CAPTION_SELECT, "drpStockGroup");
+        } else if (code.includes(";")) {        
+            //////// Generate ETF Sub Dropdown List
+            var filteredETFList = $(etfListData.list).filter(function( idx ) {
+                return etfListData.list[idx].code == code;
+            }); 
+            
+            ///////// Create ETF Sub Dropdown List
+            createDropdownMenu("drpStockGroupSub", filteredETFList[0], CAPTION_SELECT, "drpStockGroup");
             
         } else if (isHavingAlpha(code)) {
-            ///////// Generate Indexes Dropdown List
-            var filteredIndexList = $(indexListData.list).filter(function( idx ) {
-                return indexListData.list[idx].code == code;
-            }); 
-            
-            ///////// Create Indexes Sub Dropdown List
-            createDropdownMenu("drpStockGroupSub", filteredIndexList[0], CAPTION_SELECT, "drpStockGroup");     
-
-        } else {
         
-            ///////// Generate Sub Industry List  
-            var filteredIndustry = $(industryData.list).filter(function( idx ) {
-                return industryData.list[idx].code == code;
+            if (code.startsWith("CSI") || code.startsWith("SZSE")) {
+            
+                ///////// Generate Indexes Dropdown List
+                var filteredIndexList = $(cnIndexListData.list).filter(function( idx ) {
+                    return cnIndexListData.list[idx].code == code;
+                }); 
+                
+                ///////// Create Indexes Sub Dropdown List
+                createDropdownMenu("drpStockGroupSub", filteredIndexList[0], CAPTION_SELECT, "drpStockGroup");   
+                
+            } else {
+                ///////// Generate Indexes Dropdown List
+                var filteredIndexList = $(indexListData.list).filter(function( idx ) {
+                    return indexListData.list[idx].code == code;
+                }); 
+                
+                ///////// Create Indexes Sub Dropdown List
+                createDropdownMenu("drpStockGroupSub", filteredIndexList[0], CAPTION_SELECT, "drpStockGroup");             
+            }
+
+        } else if (code.length == 4) {
+        
+            ///////// Generate HK Sub Industry List  
+            var filteredIndustry = $(industryListData.list).filter(function( idx ) {
+                return industryListData.list[idx].code == code;
             }); 
             
-            //////// Create Industry Sub Dropdown List
+            //////// Create HK Industry Sub Dropdown List
             createDropdownMenu("drpStockGroupSub", filteredIndustry[0], CAPTION_SELECT, "drpStockGroup");            
         }
     });
     
     //////// US Indexes/EFT/Industry Dropdown List
-    options = $.map(usIndexETFListData.list, function (item, i) {
+    optionsIndex = $.map(usIndexListData.list, function (item, i) {
         return $('<option>', { text: item.label, value: item.code });
-    }); 
+    });
+
+    optionsETF = $.map(usETFListData.list, function (item, i) {
+        return $('<option>', { text: item.label, value: item.code });
+    });    
+    
+    optionsIndustry = $.map(usIndustryListData.list, function (item, i) {
+        return $('<option>', { text: item.label, value: item.code });
+    });     
      
     $("#drpUSStockGroup").empty()
         .append($('<option>', { text: "US Stocks Select", value: "" }))
-        .append(options);      
+        .append($('<option>', { text: "-------- US Indexes --------", value: "" }))
+        .append(optionsIndex)
+        .append($('<option>', { text: "-------- US ETF --------", value: "" }))
+        .append(optionsETF)
+        .append($('<option>', { text: "-------- US Industries --------", value: "" }))
+        .append(optionsIndustry);      
         
     $(document).on('change','#drpUSStockGroup' ,function(){
         
@@ -285,14 +347,28 @@ $(window).load(function(){
         
         if (code == "") {
             // Nill case
-        } else {
+        } else if (code.startsWith("USIDX")){
         
-            ///////// Generate Sub Industry List  
-            var filteredList = $(usIndexETFListData.list).filter(function( idx ) {
-                return usIndexETFListData.list[idx].code == code;
+            var filteredList = $(usIndexListData.list).filter(function( idx ) {
+                return usIndexListData.list[idx].code == code;
             }); 
             
-            //////// Create Industry Sub Dropdown List
+            createDropdownMenu("drpUSStockGroupSub", filteredList[0], CAPTION_SELECT_EN, "drpUSStockGroup"); 
+            
+        } else if (code.startsWith("USETF")){
+
+            var filteredList = $(usETFListData.list).filter(function( idx ) {
+                return usETFListData.list[idx].code == code;
+            }); 
+            
+            createDropdownMenu("drpUSStockGroupSub", filteredList[0], CAPTION_SELECT_EN, "drpUSStockGroup");   
+            
+        } else if (code.startsWith("USIND")){
+        
+            var filteredList = $(usIndustryListData.list).filter(function( idx ) {
+                return usIndustryListData.list[idx].code == code;
+            }); 
+            
             createDropdownMenu("drpUSStockGroupSub", filteredList[0], CAPTION_SELECT_EN, "drpUSStockGroup");            
         }
     });    
@@ -306,7 +382,12 @@ $(window).load(function(){
  
     $(document).on('click', 'a[id^="tf"]', function(){
     
-        var isUS = ($("#drpUSStockGroup").val() != "");
+        var usVal = $("#drpUSStockGroup").val();
+        var hkVal = $("#drpStockGroup").val();
+    
+        var isUS = (usVal != "");        
+        var isCN = (hkVal != "" && (hkVal.startsWith("CSI") || hkVal.startsWith("SZSE")));
+        
         var new_period = this.id.replace("tf_","");
         
         if (isUS) {       
@@ -314,6 +395,15 @@ $(window).load(function(){
             var tf = $(tfUSPeriod.list).filter(function( idx ) {
                 //alert("[" + tfUSPeriod.list[idx].timeframe + "], [" + tfText + "]");            
                 return tfUSPeriod.list[idx].timeframe == tfText;
+            }); 
+            
+            new_period = tf[0].period;
+            
+        } else if (isCN) {       
+            var tfText = this.text;
+            var tf = $(tfCNPeriod.list).filter(function( idx ) {
+                //alert("[" + tfUSPeriod.list[idx].timeframe + "], [" + tfText + "]");            
+                return tfCNPeriod.list[idx].timeframe == tfText;
             }); 
             
             new_period = tf[0].period;

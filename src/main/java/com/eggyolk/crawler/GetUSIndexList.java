@@ -32,7 +32,7 @@ public class GetUSIndexList implements GenericLabelList {
 
             JSONObject cobj = new JSONObject();
             cobj.put("label", lbl.descEn);
-            cobj.put("code", "US" + id);
+            cobj.put("code", "USIDX" + id);
 
             JSONArray jsonList = new JSONArray();
 

@@ -32,7 +32,7 @@ public class GetCNIndustryList implements GenericLabelList {
 
             JSONObject cobj = new JSONObject();
             cobj.put("label", lbl.descZh);
-            cobj.put("code", lbl.code);
+            cobj.put("code", lbl.code.trim());
 
             JSONArray jsonList = new JSONArray();
 

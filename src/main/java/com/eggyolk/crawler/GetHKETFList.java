@@ -41,6 +41,7 @@ public class GetHKETFList implements GenericLabelList {
                 JSONObject iobj = new JSONObject();
                 iobj.put("label", label.descZh);
                 iobj.put("code", label.code);
+                iobj.put("addInfo", label.addInfo);
                 jsonList.add(iobj);
             });
 
@@ -127,7 +128,7 @@ public class GetHKETFList implements GenericLabelList {
                     Label lbl = new Label();
                     lbl.code = a.attr("href").split("=")[1];
                     lbl.descZh = a.text();
-                    lbl.addInfo = "Ref Entity: " + cols.get(1).text();
+                    lbl.addInfo = "Tracker: " + cols.get(1).text();
                     sublist.add(lbl);
                     //System.out.println(lbl);
                 }
