@@ -11,7 +11,17 @@ public class AastocksWriteToJS {
     public static void main(String[] args) throws Exception {
 
         // Write JS Test
-        (new AastocksWriteToJS()).writeJS();
+        //(new AastocksWriteToJS()).writeJS();
+
+        // Write JSON Test
+        (new AastocksWriteToJS()).writeJSON();
+    }
+
+    public void writeJSON() throws Exception {
+
+        this.writeJsonListFile("IndexList", new GetHKIndexList());
+        //this.writeJsonListFile("BlueChip", new GetHKBlueChipList());
+        //this.writeJsonListFile("Industry", new GetHKIndustryList());
     }
 
     public void writeJS() throws Exception {
@@ -50,9 +60,6 @@ public class AastocksWriteToJS {
             e.printStackTrace();
         }
 
-        //this.writeJsonListFile("ETF", new GetHKETF100List());
-        //this.writeJsonListFile("BlueChip", new GetHKBlueChipList());
-        //this.writeJsonListFile("Industry", new GetHKIndustryList());
     }
 
     public void writeJsonListFile(String listName, GenericLabelList list) throws Exception {
