@@ -19,7 +19,13 @@ public class AastocksWriteToJS {
 
     public void writeJSON() throws Exception {
 
-        this.writeJsonListFile("IndexList", new GetHKIndexList());
+        //this.writeJsonListFile("IndexList", new GetHKIndexList());
+        this.writeJsonListFile("ETFList", new GetHKETFList());
+        //this.writeJsonListFile("IndustryList", new GetHKIndustryList());
+        //this.writeJsonListFile("USETFList", new GetUSETFList());
+        //this.writeJsonListFile("USIndexList", new GetUSIndexList());
+        //this.writeJsonListFile("USIndustryList", new GetUSIndustryList());
+
         //this.writeJsonListFile("BlueChip", new GetHKBlueChipList());
         //this.writeJsonListFile("Industry", new GetHKIndustryList());
     }

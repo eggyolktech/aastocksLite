@@ -78,9 +78,9 @@ public class GetHKETFList implements GenericLabelList {
 
                 //System.out.println(option.text() + "[" + option.attr("value") + "]");
                 Label lbl = new Label();
-                lbl.code = option.attr("value");
+                lbl.code = "HKETF" + i;
                 lbl.descZh = option.text();
-                lbl.addInfo ="";
+                lbl.addInfo = option.attr("value");
                 list.add(lbl);
             }
         } catch (IOException e) {
@@ -113,7 +113,7 @@ public class GetHKETFList implements GenericLabelList {
 
             try {
 
-                Document doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/etf/search.aspx?t=1&s=8&o=0&cat=" + label.code).get();
+                Document doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/etf/search.aspx?t=1&s=8&o=0&cat=" + label.addInfo).get();
                 ArrayList<Label> sublist = new ArrayList();
                 Element table = doc.select("table#tabETF1").get(0);
                 Elements rows = table.select("tr");
