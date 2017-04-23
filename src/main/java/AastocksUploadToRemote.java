@@ -7,7 +7,12 @@ import java.io.InputStream;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class AastocksUploadToRemote {
 
@@ -15,6 +20,25 @@ public class AastocksUploadToRemote {
 
         // Write JS Test
         (new AastocksUploadToRemote()).uploadToRemoteFTP();
+    }
+
+    public static void pack(String sourceDirPath, String zipFilePath) throws IOException {
+        Path p = Files.createFile(Paths.get(zipFilePath));
+        try (ZipOutputStream zs = new ZipOutputStream(Files.newOutputStream(p))) {
+            Path pp = Paths.get(sourceDirPath);
+            Files.walk(pp)
+                    .filter(path -> !Files.isDirectory(path))
+                    .forEach(path -> {
+                        ZipEntry zipEntry = new ZipEntry(pp.relativize(path).toString());
+                        try {
+                            zs.putNextEntry(zipEntry);
+                            zs.write(Files.readAllBytes(path));
+                            zs.closeEntry();
+                        } catch (Exception e) {
+                            System.err.println(e);
+                        }
+                    });
+        }
     }
 
     public void uploadToRemoteFTP() {
