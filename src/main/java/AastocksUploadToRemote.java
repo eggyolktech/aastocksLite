@@ -18,8 +18,25 @@ public class AastocksUploadToRemote {
 
     public static void main(String[] args) throws Exception {
 
-        // Write JS Test
-        (new AastocksUploadToRemote()).uploadToRemoteFTP();
+        Properties prop = new Properties();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        InputStream stream = loader.getResourceAsStream("main.properties");
+        prop.load(stream);
+
+        try {
+            // Write JS Test
+            (new AastocksUploadToRemote()).uploadToRemoteFTP();
+
+            // Zip
+            File file = new File(prop.getProperty("webfile"));
+            Files.deleteIfExists(file.toPath()); //surround it in try catch block
+
+            (new AastocksUploadToRemote()).pack(prop.getProperty("webpath"), prop.getProperty("webfile"));
+
+        } catch (IOException ex) {
+            System.out.println("Error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     public static void pack(String sourceDirPath, String zipFilePath) throws IOException {

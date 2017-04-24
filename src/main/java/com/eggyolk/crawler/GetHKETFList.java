@@ -129,8 +129,14 @@ public class GetHKETFList implements GenericLabelList {
                     lbl.code = a.attr("href").split("=")[1];
                     lbl.descZh = a.text();
                     lbl.addInfo = "Tracker: " + cols.get(1).text();
-                    sublist.add(lbl);
-                    //System.out.println(lbl);
+
+                    String[] arr =  {"ＦＩ", "ＦＬ", "ＸＬ", "ＸＩ"};
+                    boolean contain = Arrays.stream(arr).anyMatch(lbl.descZh::contains);
+
+                    if (!contain)
+                        sublist.add(lbl);
+                    else
+                        System.out.println("Skipped: " + lbl);
                 }
 
                 System.out.println(label.descZh + "/" + label.code + ": [" + sublist.size() + " record(s)]");

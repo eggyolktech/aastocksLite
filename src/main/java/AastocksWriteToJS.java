@@ -11,10 +11,10 @@ public class AastocksWriteToJS {
     public static void main(String[] args) throws Exception {
 
         // Write JS Test
-        //(new AastocksWriteToJS()).writeJS();
+        (new AastocksWriteToJS()).writeJS();
 
         // Write JSON Test
-        (new AastocksWriteToJS()).writeJSON();
+        //(new AastocksWriteToJS()).writeJSON();
     }
 
     public void writeJSON() throws Exception {

@@ -276,7 +276,7 @@ $(window).load(function(){
         
         if (code == "") {
             // Nill case
-        } else if (code.includes(";")) {        
+        } else if (code.includes("HKETF")) {        
             //////// Generate ETF Sub Dropdown List
             var filteredETFList = $(etfListData.list).filter(function( idx ) {
                 return etfListData.list[idx].code == code;
