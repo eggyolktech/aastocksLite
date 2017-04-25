@@ -126,10 +126,12 @@ function displaySingleChart(code){
     }
 }
 
-function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset ) {
+function createDropdownMenu(drpId, drpData, drpDesc, drpToSkipReset, showCode ) {
 
     var options = $.map(drpData.list, function ( item, i) {
-        return $('<option>', { text: item.label, value: item.code });
+        optionText = item.label;
+        if (showCode) optionText = item.code + " - " + item.label
+        return $('<option>', { text: optionText, value: item.code });
     });
     
     $("#" + drpId).empty()
@@ -283,7 +285,7 @@ $(window).load(function(){
             }); 
             
             ///////// Create ETF Sub Dropdown List
-            createDropdownMenu("drpStockGroupSub", filteredETFList[0], CAPTION_SELECT, "drpStockGroup");
+            createDropdownMenu("drpStockGroupSub", filteredETFList[0], CAPTION_SELECT, "drpStockGroup", true);
             
         } else if (isHavingAlpha(code)) {
         
@@ -295,7 +297,7 @@ $(window).load(function(){
                 }); 
                 
                 ///////// Create Indexes Sub Dropdown List
-                createDropdownMenu("drpStockGroupSub", filteredIndexList[0], CAPTION_SELECT, "drpStockGroup");   
+                createDropdownMenu("drpStockGroupSub", filteredIndexList[0], CAPTION_SELECT, "drpStockGroup", true);   
                 
             } else {
                 ///////// Generate Indexes Dropdown List
@@ -304,7 +306,7 @@ $(window).load(function(){
                 }); 
                 
                 ///////// Create Indexes Sub Dropdown List
-                createDropdownMenu("drpStockGroupSub", filteredIndexList[0], CAPTION_SELECT, "drpStockGroup");             
+                createDropdownMenu("drpStockGroupSub", filteredIndexList[0], CAPTION_SELECT, "drpStockGroup", true);             
             }
 
         } else if (code.length == 4) {
@@ -315,7 +317,7 @@ $(window).load(function(){
             }); 
             
             //////// Create HK Industry Sub Dropdown List
-            createDropdownMenu("drpStockGroupSub", filteredIndustry[0], CAPTION_SELECT, "drpStockGroup");            
+            createDropdownMenu("drpStockGroupSub", filteredIndustry[0], CAPTION_SELECT, "drpStockGroup", true);            
         }
     });
     

@@ -113,7 +113,9 @@ public class GetHKETFList implements GenericLabelList {
 
             try {
 
-                Document doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/etf/search.aspx?t=1&s=8&o=0&cat=" + label.addInfo).get();
+                //http://www.aastocks.com/tc/stocks/etf/search.aspx?t=1&s=1&o=1&cat=1;14&sl=1
+
+                Document doc = Jsoup.connect("http://www.aastocks.com/tc/stocks/etf/search.aspx?t=1&s=1&o=1&cat=" + label.addInfo + "&sl=1").get();
                 ArrayList<Label> sublist = new ArrayList();
                 Element table = doc.select("table#tabETF1").get(0);
                 Elements rows = table.select("tr");
