@@ -94,8 +94,11 @@ function registerStreamingSource(imgid, inputCode, period, interval) {
     // Set up img source
     $("#" + imgid).attr("src", url);
     
-    // Set up refresh
-    registerInterval(imgid, url, interval);    
+    // Set up refresh    
+    var dt = new Date();
+    if (dt.getHours() <= 16) {
+        registerInterval(imgid, url, interval);
+    }
 }
 
 function registerInterval(imgid, url, interval) {
