@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  
+  <style type="text/css">
+  
+    body {  
+        font-family: Arial;
+        font-size: 13px;
+    }
+
+    a {
+        margin-left: 7px;
+    }
+
+    a.highlight {
+        margin-left: 7px;
+        color: red;
+        background-color: yellow;
+        font-weight: bold;
+    }
+    
+    /* unvisited link */
+    a:link {
+        color: green;
+    }
+
+    /* visited link */
+    a:visited {
+        color: green;
+        
+    }
+
+    /* mouse over link */
+    a:hover {
+        color: red;
+    }
+
+    /* selected link */
+    a:active {
+        color: yellow;
+    }
+    
+    #backtotop { 
+        height: 20px; 
+        font-size: 11px;
+        position: fixed;
+        left:95%;
+        bottom:2%;
+        width:10%; 
+        background-color: white;
+        opacity: 100;
+    }
+    
+  </style>
+
+  <title>GWC Streaming</title>
+
+<script type='text/javascript'>//<![CDATA[
+
+$.urlParam = function(name){
+
+    var results = new RegExp('[\?&]' + name + '=([^]*)').exec(window.location.href);
+
+    if (results==null){
+       return null;
+    }
+    else{
+       return results[1] || 0;
+    }   
+}
+
+function registerStreamingSource(imgid, inputCode, period, interval) {
+
+    var common_width = "642";
+    var common_height = "490";
+        
+    url = "http://charts.aastocks.com/servlet/Charts?fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1"
+    + "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=52"
+    + "&subChart1=2&ref1para1=3&ref1para2=0&ref1para3=0"
+    + "&subChart2=3&ref2para1=12&ref2para2=26&ref2para3=9"
+    + "&subChart4=7&ref4para1=16&ref4para2=8&ref4para3=0"
+    + "&scheme=1&com=100&chartwidth=" + common_width + "&chartheight=" + common_height
+    + "&stockid=" + inputCode + ".HK"
+    + "&period=" + period
+    + "&type=1";
+    //+ "&indicator3=10&ind3para1=11.880&logoStyle=1&";
+    
+    // Set up img source
+    $("#" + imgid).attr("src", url);
+    
+    // Set up refresh
+    registerInterval(imgid, url, interval);    
+}
+
+function registerInterval(imgid, url, interval) {
+
+    setInterval(function() {    
+        d = new Date();        
+        $("#" + imgid).attr("src", url + "&timeattr=" +d.getTime());
+    }, interval);
+
+}
+
+
+//////// Main JS Function
+$(window).load(function(){
+
+    var inputCode = "2800";
+
+    if ($.urlParam('code')) {
+        // List Individual cases
+        inputCode = $.urlParam('code');
+    }  
+    
+    // 5000 - 1min
+    // 5012 - 5 mins
+    // 2 - 15 mins
+    // 5023 - 1 hour    
+    registerStreamingSource("1min", inputCode, 5000, 3000);    
+    registerStreamingSource("5min", inputCode, 5012, 3000);
+    registerStreamingSource("15min", inputCode, 2, 3000);
+    registerStreamingSource("1hr", inputCode, 5023, 3000);    
+    
+});
+    
+//]]> 
+
+</script>
+
+  
+</head>
+
+<body>
+    <div id="top"></div>
+    <div id="backtotop"><a href="#top"><b>Top</b></a></div>
+    <table border="0">
+        <tr>
+            <td><div id="1HrDiv"><img id="1hr" src="./images/enter.png"/></td>            
+            <td><div id="15minDiv"><img id="15min" src="./images/enter.png"/></td>
+        </tr>
+        <tr>
+            <td><div id="5minDiv"><img id="5min" src="./images/enter.png"/></div></td>
+            <td><div id="1minDiv"><img id="1min" src="./images/enter.png"/></div></td>
+        </tr>        
+        
+    </table>
+    
+    
+</body>
+
+</html>
