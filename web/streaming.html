@@ -75,10 +75,12 @@ $.urlParam = function(name){
     }   
 }
 
-function registerStreamingSource(imgid, inputCode, period, interval) {
+function registerStreamingSource(imgid, inputCode, period, interval, colspan) {
 
     var common_width = "642";
     var common_height = "490";
+    
+    if (colspan) common_width = "1142";
         
     url = "http://charts.aastocks.com/servlet/Charts?fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1"
     + "&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=52"
@@ -94,11 +96,8 @@ function registerStreamingSource(imgid, inputCode, period, interval) {
     // Set up img source
     $("#" + imgid).attr("src", url);
     
-    // Set up refresh    
-    var dt = new Date();
-    if (dt.getHours() <= 16) {
-        registerInterval(imgid, url, interval);
-    }
+    // Set up refresh
+    registerInterval(imgid, url, interval);    
 }
 
 function registerInterval(imgid, url, interval) {
@@ -125,12 +124,14 @@ $(window).load(function(){
     // 5012 - 5 mins
     // 2 - 15 mins
     // 5023 - 1 hour    
-    registerStreamingSource("1min", inputCode, 5000, 3000);    
-    registerStreamingSource("5min", inputCode, 5012, 3000);
-    registerStreamingSource("15min", inputCode, 2, 3000);
-    registerStreamingSource("1hr", inputCode, 5023, 3000);    
-    
-});
+    registerStreamingSource("1min", inputCode, 5000, 3000, false);    
+    registerStreamingSource("5min", inputCode, 5012, 3000, false);
+    registerStreamingSource("15min", inputCode, 2, 3000, false);
+    registerStreamingSource("1hr", inputCode, 5023, 3000, false);    
+    registerStreamingSource("daily", inputCode, 9, 60000, true);
+    registerStreamingSource("weekly", inputCode, 11, 60000, true);        
+
+});http://charts.aastocks.com/servlet/Charts?fontsize=12&15MinDelay=F&lang=1&titlestyle=1&vol=1&Indicator=1&indpara1=4&indpara2=6&indpara3=14&indpara4=27&indpara5=52&subChart1=2&ref1para1=3&ref1para2=0&ref1para3=0&subChart2=3&ref2para1=12&ref2para2=26&ref2para3=9&subChart4=7&ref4para1=16&ref4para2=8&ref4para3=0&scheme=1&com=100&chartwidth=642&chartheight=490&stockid=2238.HK&period=2&type=1&timeattr=1500430480048
     
 //]]> 
 
@@ -151,7 +152,12 @@ $(window).load(function(){
             <td><div id="5minDiv"><img id="5min" src="./images/enter.png"/></div></td>
             <td><div id="1minDiv"><img id="1min" src="./images/enter.png"/></div></td>
         </tr>        
-        
+        <tr>
+            <td colspan="2"><div id="dailyDiv"><img id="daily" src="./images/enter.png"/></div></td>
+        </tr>                
+        <tr>
+            <td colspan="2"><div id="weeklyDiv"><img id="weekly" src="./images/enter.png"/></div></td>
+        </tr>            
     </table>
     
     
